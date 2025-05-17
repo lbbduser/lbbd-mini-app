@@ -293,19 +293,19 @@
         }
 
         select option[value="bKash"] {
-            color: #ff4d4d; /* Vibrant red for bKash */
+            color: #ff4d4d;
         }
 
         select option[value="Nagad"] {
-            color: #00cc00; /* Bright green for Nagad */
+            color: #00cc00;
         }
 
         select option[value="Binance"] {
-            color: #f0b90b; /* Binance yellow */
+            color: #f0b90b;
         }
 
         select option[value="Crypto"] {
-            color: #00b7eb; /* Cyan for Crypto */
+            color: #00b7eb;
         }
 
         input::placeholder {
@@ -313,12 +313,10 @@
             opacity: 0.8;
         }
 
-        /* Amount Input Validation */
         input#amount.invalid {
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7);
         }
 
-        /* Input Cursor Glow */
         input:focus::after {
             content: '';
             position: absolute;
@@ -691,23 +689,32 @@
         // Admin Telegram ID
         const adminTelegramId = '6672573765';
 
-        // Initialize Telegram Web App with fallback
+        // Improved Telegram Web App initialization
         function initTelegram() {
-            const Telegram = window.Telegram;
-            if (Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                currentUser = Telegram.WebApp.initDataUnsafe.user;
-                if (currentUser) {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const Telegram = window.Telegram.WebApp;
+                Telegram.ready();
+                currentUser = Telegram.initDataUnsafe.user;
+                if (currentUser && currentUser.id) {
                     showPopup(`Your Telegram ID: ${currentUser.id}`);
                     if (currentUser.id.toString() === adminTelegramId) {
                         document.getElementById('nav-admin').style.display = 'block';
                     }
                 } else {
-                    showPopup('Unable to detect Telegram user ID.');
+                    showPopup('Unable to detect Telegram user ID. Please try again.');
                 }
             } else {
-                showPopup('Telegram WebApp not available. Testing mode: Admin enabled.');
-                document.getElementById('nav-admin').style.display = 'block'; // Fallback for testing
+                showPopup('Telegram WebApp not available. Please use within Telegram.');
+            }
+            setTimeout(checkAdmin, 1000); // Fallback check
+        }
+
+        function checkAdmin() {
+            if (!currentUser && window.Telegram && window.Telegram.WebApp) {
+                currentUser = window.Telegram.WebApp.initDataUnsafe.user;
+                if (currentUser && currentUser.id && currentUser.id.toString() === adminTelegramId) {
+                    document.getElementById('nav-admin').style.display = 'block';
+                }
             }
         }
 
@@ -774,11 +781,11 @@
         document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
         document.getElementById('nav-about').addEventListener('click', () => showPage('about'));
         document.getElementById('nav-admin').addEventListener('click', () => {
-            if (currentUser && currentUser.id.toString() === adminTelegramId) {
+            if (currentUser && currentUser.id && currentUser.id.toString() === adminTelegramId) {
                 showPage('admin');
                 loadAdminPanel();
             } else {
-                showPopup('Access denied: Admin only.');
+                showPopup('Access denied: Admin only. Your ID must be 6672573765.');
             }
         });
 
@@ -808,7 +815,6 @@
             const shareUrl = `tg://msg?text=${encodeURIComponent(shareText)}`;
             window.open(shareUrl, '_blank');
 
-            // Fallback for browsers
             setTimeout(() => {
                 if (!document.hasFocus()) return;
                 const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
@@ -827,7 +833,6 @@
             detailsInput.placeholder = `Enter ${selectedMethod} details`;
         });
 
-        // Ensure method prefix persists
         detailsInput.addEventListener('input', () => {
             const selectedMethod = methodSelect.value;
             if (!detailsInput.value.startsWith(`${selectedMethod}: `)) {
@@ -894,7 +899,6 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
-            // Load users
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
             const usersSnapshot = await db.collection('users').get();
@@ -918,7 +922,6 @@
                 userList.appendChild(userItem);
             });
 
-            // Load withdraw requests
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
             const withdrawSnapshot = await db.collection('withdraw_requests').get();
@@ -991,7 +994,7 @@
             document.getElementById('splash').remove();
             showPage('balance');
             initializeUser();
-            initTelegram(); // Ensure Telegram initializes after splash
+            initTelegram();
         }, 4000);
 
         // Resize canvas on window resize
