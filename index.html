@@ -150,7 +150,7 @@
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent; /* Disable Telegram's default tap highlight */
+            -webkit-tap-highlight-color: transparent;
         }
 
         button::before {
@@ -202,12 +202,11 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Override Telegram's default tap highlight */
         button:focus,
         button:active {
             outline: none;
             -webkit-tap-highlight-color: transparent;
-            background: linear-gradient(45deg, #8a00ff, #c200ff); /* Maintain our gradient */
+            background: linear-gradient(45deg, #8a00ff, #c200ff);
         }
 
         .invite-page .action-button,
@@ -314,6 +313,7 @@
         }
 
         .popup p { margin-bottom: 1.3rem; font-size: 1rem; color: #e6e6ff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+        .popup input { margin-bottom: 1rem; }
         @keyframes popupShow { to { transform: translate(-50%, -50%) scale(1); } }
         .popup button { padding: 0.7rem 1.3rem; }
 
@@ -339,6 +339,10 @@
             font-size: 0.85rem;
             text-align: center;
             white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
         }
 
         .nav.admin-active button {
@@ -462,13 +466,16 @@
         <button id="nav-invite">Invite Friends</button>
         <button id="nav-withdraw">Withdraw</button>
         <button id="nav-about">About</button>
-        <button id="nav-admin" style="display: none;">Admin</button>
+        <button id="nav-admin">Admin</button>
     </div>
     <div class="popup" id="popup" style="display: none;">
         <p id="popup-message"></p>
-        <button onclick="closePopup()">OK</button>
+        <input type="password" id="admin-password" placeholder="Enter admin password" style="display: none;">
+        <button id="popup-ok" onclick="closePopup()">OK</button>
+        <button id="admin-submit" onclick="checkAdminPassword()" style="display: none;">Submit</button>
     </div>
     <script>
+        let db = null;
         try {
             const firebaseConfig = {
                 apiKey: "AIzaSyDdYyNNk7FxUptu40Riumr2ZcftMglPMVk",
@@ -479,7 +486,7 @@
                 appId: "1:1036805634476:web:7db1862c7acc8fd7796209"
             };
             const app = firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
+            db = firebase.firestore();
             console.log('Firebase initialized successfully');
         } catch (error) {
             console.error('Firebase initialization error:', error);
@@ -535,59 +542,55 @@
         let balance = 0;
         let friendsInvited = 0;
         let currentUser = null;
+        let referrerId = null;
         const telegramChannel = 'https://t.me/LBBD_MINING_OFFICIAL';
         const baseReferralUrl = 'https://lbbduser.github.io/lbbd-mini-app/?ref=';
-        const adminTelegramId = '6672573765';
+        const adminPassword = 'hussainriyalbbd';
+        let isAdminAuthenticated = false;
 
         function initTelegram() {
-            // Check if we're in the Telegram environment
             const isTelegram = window.Telegram && window.Telegram.WebApp;
             if (!isTelegram) {
                 showPopup('Please use this app within Telegram.');
-                return;
+                return false;
             }
 
             const Telegram = window.Telegram.WebApp;
             Telegram.ready();
+            Telegram.expand();
+            Telegram.enableClosingConfirmation();
 
             let attempts = 0;
             const maxAttempts = 10;
             const checkInterval = setInterval(() => {
                 currentUser = Telegram.initDataUnsafe.user;
                 if (currentUser && currentUser.id) {
-                    showPopup(`Your Telegram ID: ${currentUser.id}`);
-                    if (currentUser.id.toString() === adminTelegramId) {
-                        document.getElementById('nav').classList.add('admin-active');
-                        document.getElementById('nav-admin').style.display = 'block';
-                    }
+                    showPopup(`Welcome! Your Telegram ID: ${currentUser.id}`);
                     clearInterval(checkInterval);
+                    initializeUser();
+                    checkReferral();
                 } else if (attempts >= maxAttempts) {
                     showPopup('Unable to detect Telegram user ID after multiple attempts. Please reload the app.');
                     clearInterval(checkInterval);
                 }
                 attempts++;
             }, 500);
-
-            // Additional safety: Force Telegram API to re-initialize
-            Telegram.expand();
-            Telegram.enableClosingConfirmation();
+            return true;
         }
 
-        function generateReferralCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
+        function generateReferralCode(userId) {
+            return btoa(userId).replace(/=/g, '').slice(0, 8);
         }
 
         async function initializeUser() {
-            if (!currentUser || !db) return;
+            if (!currentUser || !db) {
+                showPopup('Database not initialized. Please try again later.');
+                return;
+            }
             const userRef = db.collection('users').doc(currentUser.id.toString());
             const userDoc = await userRef.get();
             if (!userDoc.exists) {
-                const referralCode = generateReferralCode();
+                const referralCode = generateReferralCode(currentUser.id.toString());
                 await userRef.set({
                     telegramId: currentUser.id,
                     username: currentUser.username || 'Anonymous',
@@ -595,35 +598,76 @@
                     referralLink: `${baseReferralUrl}${referralCode}`,
                     invitedUsers: [],
                     isBanned: false,
-                    withdrawalHistory: []
+                    withdrawalHistory: [],
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
             const userData = (await userRef.get()).data();
-            balance = userData.coins;
-            friendsInvited = userData.invitedUsers.length;
+            balance = userData.coins || 0;
+            friendsInvited = userData.invitedUsers ? userData.invitedUsers.length : 0;
             document.getElementById('balance-amount').textContent = `${balance} Coins`;
             document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
             document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
         }
 
+        async function checkReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref && currentUser && currentUser.id) {
+                try {
+                    const decodedRef = atob(ref.padEnd((ref.length + 3) & ~3, '='));
+                    if (decodedRef !== currentUser.id.toString()) {
+                        referrerId = decodedRef;
+                        await friendJoined(decodedRef);
+                    }
+                } catch (e) {
+                    console.error('Error decoding referral:', e);
+                }
+            }
+        }
+
         async function friendJoined(referrerId) {
-            if (!db) return;
-            const referrerRef = db.collection('users').doc(referrerId.toString());
+            if (!db || !currentUser || !referrerId) {
+                showPopup('Database not initialized or user not found.');
+                return;
+            }
+            const userRef = db.collection('users').doc(currentUser.id.toString());
+            const referrerRef = db.collection('users').doc(referrerId);
+            const userDoc = await userRef.get();
             const referrerDoc = await referrerRef.get();
-            if (referrerDoc.exists) {
-                const referrerData = referrerDoc.data();
-                const updatedInvited = [...new Set([...referrerData.invitedUsers, currentUser.id])];
-                await referrerRef.update({
-                    coins: referrerData.coins + 1,
-                    invitedUsers: updatedInvited
-                });
-                balance = referrerData.coins + 1;
+
+            if (!referrerDoc.exists) {
+                console.log('Referrer not found');
+                return;
+            }
+
+            const referrerData = referrerDoc.data();
+            const userData = userDoc.exists ? userDoc.data() : { invitedBy: null };
+
+            if (userData.invitedBy) {
+                console.log('User already has a referrer');
+                return;
+            }
+
+            const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
+            await referrerRef.update({
+                coins: (referrerData.coins || 0) + 1,
+                invitedUsers: updatedInvited
+            });
+
+            await userRef.update({
+                invitedBy: referrerId
+            });
+
+            if (referrerId === currentUser.id.toString()) {
+                balance = (referrerData.coins || 0) + 1;
                 friendsInvited = updatedInvited.length;
                 document.getElementById('balance-amount').textContent = `${balance} Coins`;
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-                document.getElementById('invite-status').textContent = `You joined via a referral! Referrer earned 1 coin.`;
-                showPopup('Welcome! Your referrer earned 1 coin.');
             }
+
+            document.getElementById('invite-status').textContent = `You joined via a referral! Referrer earned 1 coin.`;
+            showPopup('Welcome! Your referrer earned 1 coin.');
         }
 
         function showPage(pageId) {
@@ -636,18 +680,57 @@
         document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
         document.getElementById('nav-about').addEventListener('click', () => showPage('about'));
         document.getElementById('nav-admin').addEventListener('click', () => {
-            if (currentUser && currentUser.id && currentUser.id.toString() === adminTelegramId) {
+            if (isAdminAuthenticated) {
                 showPage('admin');
                 loadAdminPanel();
             } else {
-                showPopup('Access denied: Admin only. Your ID must be 6672573765.');
+                showAdminPasswordPrompt();
             }
         });
+
+        function showAdminPasswordPrompt() {
+            const popup = document.getElementById('popup');
+            const popupMessage = document.getElementById('popup-message');
+            const adminPasswordInput = document.getElementById('admin-password');
+            const okButton = document.getElementById('popup-ok');
+            const submitButton = document.getElementById('admin-submit');
+
+            popupMessage.textContent = 'Enter Admin Password';
+            adminPasswordInput.style.display = 'block';
+            okButton.style.display = 'none';
+            submitButton.style.display = 'block';
+
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
+        }
+
+        function checkAdminPassword() {
+            const passwordInput = document.getElementById('admin-password').value;
+            if (passwordInput === adminPassword) {
+                isAdminAuthenticated = true;
+                closePopup();
+                showPage('admin');
+                loadAdminPanel();
+            } else {
+                showPopup('Incorrect password. Please try again.');
+            }
+        }
 
         function showPopup(message) {
             const popup = document.getElementById('popup');
             const popupMessage = document.getElementById('popup-message');
+            const adminPasswordInput = document.getElementById('admin-password');
+            const okButton = document.getElementById('popup-ok');
+            const submitButton = document.getElementById('admin-submit');
+
             popupMessage.textContent = message;
+            adminPasswordInput.style.display = 'none';
+            adminPasswordInput.value = '';
+            okButton.style.display = 'block';
+            submitButton.style.display = 'none';
+
             popup.style.display = 'block';
             setTimeout(() => {
                 popup.style.transform = 'translate(-50%, -50%) scale(1)';
@@ -686,7 +769,10 @@
         });
 
         async function withdraw() {
-            if (!currentUser || !db) return;
+            if (!currentUser || !db) {
+                showPopup('Database not initialized or user not found.');
+                return;
+            }
             if (balance === 0) {
                 showPopup('You have no coins to withdraw!');
                 return;
@@ -736,7 +822,7 @@
         }
 
         async function loadAdminPanel() {
-            if (!currentUser || !db || currentUser.id.toString() !== adminTelegramId) {
+            if (!isAdminAuthenticated || !db) {
                 document.getElementById('admin-access-message').textContent = 'Access denied: Admin only.';
                 return;
             }
@@ -754,9 +840,9 @@
                     <p>Username: ${user.username}</p>
                     <p>Coins: ${user.coins}</p>
                     <p>Referral Link: ${user.referralLink}</p>
-                    <p>Invited Users: ${user.invitedUsers.join(', ') || 'None'}</p>
+                    <p>Invited Users: ${user.invitedUsers ? user.invitedUsers.join(', ') : 'None'}</p>
                     <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
-                    <p>Withdrawal History: ${user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') || 'None'}</p>
+                    <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') : 'None'}</p>
                     <button onclick="adjustCoins('${doc.id}', 10)">+10 Coins</button>
                     <button onclick="adjustCoins('${doc.id}', -10)">-10 Coins</button>
                     <button onclick="resetReferralLink('${doc.id}')">Reset Referral Link</button>
@@ -787,7 +873,10 @@
         }
 
         async function adjustCoins(userId, amount) {
-            if (!db) return;
+            if (!db) {
+                showPopup('Database not initialized.');
+                return;
+            }
             const userRef = db.collection('users').doc(userId);
             await userRef.update({ coins: firebase.firestore.FieldValue.increment(amount) });
             loadAdminPanel();
@@ -795,8 +884,11 @@
         }
 
         async function resetReferralLink(userId) {
-            if (!db) return;
-            const newCode = generateReferralCode();
+            if (!db) {
+                showPopup('Database not initialized.');
+                return;
+            }
+            const newCode = generateReferralCode(userId);
             const userRef = db.collection('users').doc(userId);
             await userRef.update({ referralLink: `${baseReferralUrl}${newCode}` });
             loadAdminPanel();
@@ -804,7 +896,10 @@
         }
 
         async function toggleBan(userId, isBanned) {
-            if (!db) return;
+            if (!db) {
+                showPopup('Database not initialized.');
+                return;
+            }
             const userRef = db.collection('users').doc(userId);
             await userRef.update({ isBanned: !isBanned });
             loadAdminPanel();
@@ -812,7 +907,10 @@
         }
 
         async function updateWithdrawStatus(requestId, status) {
-            if (!db) return;
+            if (!db) {
+                showPopup('Database not initialized.');
+                return;
+            }
             const requestRef = db.collection('withdraw_requests').doc(requestId);
             const request = (await requestRef.get()).data();
             await requestRef.update({ status });
@@ -829,13 +927,7 @@
         setTimeout(() => {
             document.getElementById('splash').remove();
             showPage('balance');
-            initializeUser();
             initTelegram();
-            const urlParams = new URLSearchParams(window.location.search);
-            const ref = urlParams.get('ref');
-            if (ref && currentUser && currentUser.id) {
-                friendJoined(ref.split('=')[1]);
-            }
         }, 4000);
 
         window.addEventListener('resize', () => {
