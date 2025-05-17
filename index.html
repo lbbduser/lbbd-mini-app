@@ -1,984 +1,991 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LBBD COMMUNITY</title>
-    <!-- Firebase SDK with defer to ensure proper loading -->
-    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0a0a25, #250a45);
-            color: #fff;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        /* Particle Background */
-        canvas#particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.5;
-        }
-
-        /* Splash Screen */
-        .splash {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, #8a00ff, #c200ff);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeOut 1s ease-in-out 3s forwards;
-        }
-
-        .splash h1 {
-            font-size: 8vw;
-            text-transform: uppercase;
-            letter-spacing: 0.7rem;
-            background: linear-gradient(45deg, #fff, #ffd700);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: pulse Zarvis infinite;
-            text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 15px #ffd700;
-        }
-
-        .splash p {
-            position: absolute;
-            bottom: 2rem;
-            font-size: 1rem;
-            color: #ffd700;
-            opacity: 0.9;
-            animation: slideUp 1s ease-in-out;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 0.9; }
-        }
-
-        /* Main App */
-        .app {
-            max-width: 600px;
-            margin: 2rem auto 7rem;
-            padding: 1.5rem;
-            opacity: 0;
-            animation: fadeIn 1s ease-in-out 3.5s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .page {
-            display: none;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            backdrop-filter: blur(25px);
-            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideIn 0.7s ease-in-out;
-            transition: transform 0.4s;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(80px) scale(0.9); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        h2 {
-            font-size: 1.7rem;
-            margin-bottom: 1.3rem;
-            color: #ffd700;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .balance-page p {
-            font-size: 2.3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ffd700, #fff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .balance-page p:nth-child(3),
-        .invite-page p,
-        .withdraw-page p,
-        .about-page p,
-        .admin-page p {
-            font-size: 1rem;
-            color: #e6e6ff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .about-page a {
-            color: #ffd700;
-            text-decoration: none;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-
-        .about-page a:hover {
-            color: #fff;
-            text-shadow: 0 0 12px #ffd700;
-        }
-
-        /* 3D Button Styling with Click Animation */
-        button {
-            background: linear-gradient(45deg, #8a00ff, #c200ff);
-            border: none;
-            padding: 0.8rem 1.8rem;
-            color: #fff;
-            font-size: 1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            position: relative;
-            transform: translateZ(0);
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, #6a00cc, #a100cc);
-            border-radius: 30px;
-            transform: translateZ(-20px);
-            z-index: -1;
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
-            transition: transform 0.3s;
-        }
-
-        button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
-            z-index: 0;
-        }
-
-        button:hover {
-            transform: translateY(-6px) translateZ(25px) rotateX(12deg);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-        }
-
-        button:hover::before {
-            transform: translateY(4px) translateZ(-15px);
-        }
-
-        button:active::after {
-            width: 200px;
-            height: 200px;
-            transition: width 0.4s ease-out, height 0.4s ease-out;
-        }
-
-        button:active {
-            transform: translateY(0) translateZ(0) scale(0.95);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Prominent Action Buttons */
-        .invite-page .action-button,
-        .withdraw-page .action-button {
-            display: block;
-            margin: 2rem auto 0;
-            padding: 1.1rem 2.2rem;
-            font-size: 1.2rem;
-            box-shadow: 0 10px 30px rgba(138, 0, 255, 0.6);
-        }
-
-        .invite-page .action-button::before,
-        .withdraw-page .action-button::before {
-            box-shadow: 0 10px 30px rgba(138, 0, 255, 0.7);
-        }
-
-        /* Premium Text Inputs */
-        input {
-            width: 100%;
-            padding: 0.9rem;
-            margin: 0.7rem 0;
-            border-radius: 15px;
-            border: none;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            color: #e6e6ff;
-            font-size: 1rem;
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(138, 0, 255, 0.3);
-            transition: box-shadow 0.3s, transform 0.3s;
-            position: relative;
-        }
-
-        select {
-            width: 100%;
-            padding: 0.9rem;
-            margin: 0.7rem 0;
-            border-radius: 15px;
-            border: 1px solid rgba(138, 0, 255, 0.5);
-            background: linear-gradient(45deg, rgba(40, 10, 80, 0.9), rgba(80, 20, 120, 0.7));
-            color: #ffd700;
-            font-size: 1rem;
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(138, 0, 255, 0.4);
-            transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23ffd700" d="M2 4l4 4 4-4H2z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 12px;
-            cursor: pointer;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.7);
-            transform: scale(1.02);
-            border-color: #ffd700;
-        }
-
-        select:hover {
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 215, 0, 0.5);
-            border-color: #ffd700;
-        }
-
-        select option {
-            background: #0a0a25;
-            color: #fff;
-            font-size: 1rem;
-            padding: 0.5rem;
-        }
-
-        select option[value="bKash"] {
-            color: #ff4d4d; /* Vibrant red for bKash */
-        }
-
-        select option[value="Nagad"] {
-            color: #00cc00; /* Bright green for Nagad */
-        }
-
-        select option[value="Binance"] {
-            color: #f0b90b; /* Binance yellow */
-        }
-
-        select option[value="Crypto"] {
-            color: #00b7eb; /* Cyan for Crypto */
-        }
-
-        input::placeholder {
-            color: #ccc;
-            opacity: 0.8;
-        }
-
-        /* Amount Input Validation */
-        input#amount.invalid {
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7);
-        }
-
-        /* Input Cursor Glow */
-        input:focus::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 1.2rem;
-            background: #ffd700;
-            animation: cursorGlow 1s infinite;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        @keyframes cursorGlow {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-
-        /* Popup */
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0, 0, 0, 0.95);
-            padding: 2rem;
-            border-radius: 30px;
-            text-align: center;
-            z-index: 2000;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            animation: popupShow 0.5s ease-in-out forwards;
-        }
-
-        .popup p {
-            margin-bottom: 1.3rem;
-            font-size: 1rem;
-            color: #e6e6ff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes popupShow {
-            to { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .popup button {
-            padding: 0.7rem 1.3rem;
-        }
-
-        /* Bottom Navigation */
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(25px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.7rem;
-            box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-        }
-
-        .nav button {
-            flex: 1;
-            margin: 0 0.5rem;
-            font-size: 0.9rem;
-            padding: 1rem;
-        }
-
-        /* About Page Notice Animation */
-        .notice {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #e6e6ff;
-            opacity: 0.9;
-            margin-top: 1.5rem;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            text-shadow: 0 0 10px rgba(138, 0, 255, 0.5);
-        }
-
-        .notice span {
-            display: inline-block;
-            animation: slideRightToLeft 20s linear infinite;
-        }
-
-        .notice::before,
-        .notice::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 25%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .notice::before {
-            left: 0;
-            background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent);
-        }
-
-        .notice::after {
-            right: 0;
-            background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent);
-        }
-
-        @keyframes slideRightToLeft {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Admin Panel Styles */
-        .admin-page .user-list, .admin-page .withdraw-list {
-            margin-top: 1rem;
-        }
-
-        .admin-page .user-item, .admin-page .withdraw-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .admin-page .user-item p, .admin-page .withdraw-item p {
-            margin: 0.5rem 0;
-        }
-
-        .admin-page .user-item button, .admin-page .withdraw-item button {
-            margin: 0.3rem 0.5rem 0 0;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .splash h1 {
-                font-size: 6vw;
-            }
-
-            .splash p {
-                font-size: 0.8rem;
-            }
-
-            h2 {
-                font-size: 1.4rem;
-            }
-
-            .balance-page p {
-                font-size: 1.8rem;
-            }
-
-            .balance-page p:nth-child(3),
-            .invite-page p,
-            .withdraw-page p,
-            .about-page p,
-            .admin-page p {
-                font-size: 0.9rem;
-            }
-
-            button {
-                font-size: 0.9rem;
-                padding: 0.7rem 1.3rem;
-            }
-
-            .invite-page .action-button,
-            .withdraw-page .action-button {
-                font-size: 1.1rem;
-                padding: 0.9rem 1.8rem;
-            }
-
-            select, input {
-                font-size: 0.9rem;
-            }
-
-            .nav button {
-                font-size: 0.8rem;
-                padding: 0.8rem;
-            }
-
-            .popup p {
-                font-size: 0.9rem;
-            }
-
-            .notice {
-                font-size: 0.8rem;
-            }
-
-            .admin-page .user-item button, .admin-page .withdraw-item button {
-                font-size: 0.8rem;
-                padding: 0.5rem 0.8rem;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .nav {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .nav button {
-                margin: 0.5rem 0;
-                width: 90%;
-            }
-
-            .app {
-                padding: 1rem;
-                margin-bottom: 10rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <canvas id="particles"></canvas>
-
-    <div class="splash" id="splash">
-        <h1>LBBD COMMUNITY</h1>
-        <p>@Developed by LBBD COMMUNITY</p>
-    </div>
-
-    <div class="app" id="app">
-        <div class="page balance-page" id="balance">
-            <h2>Your Balance</h2>
-            <p id="balance-amount">0 Coins</p>
-            <p>Current coin value: To be announced soon!</p>
-        </div>
-
-        <div class="page invite-page" id="invite">
-            <h2>Invite Friends</h2>
-            <p>Share your unique referral link and earn 1 coin per friend who joins!</p>
-            <p id="referral-link">Generating your link...</p>
-            <p id="friends-invited">Friends Invited: 0</p>
-            <p id="invite-status"></p>
-            <button class="action-button" onclick="shareTelegram()">Share Telegram Community</button>
-        </div>
-
-        <div class="page withdraw-page" id="withdraw">
-            <h2>Withdraw Coins</h2>
-            <p>Minimum withdrawal amount: To be announced soon!</p>
-            <select id="method">
-                <option value="bKash">bKash</option>
-                <option value="Nagad">Nagad</option>
-                <option value="Binance">Binance</option>
-                <option value="Crypto">Crypto</option>
-            </select>
-            <input type="number" id="amount" placeholder="Enter amount" min="1" onkeypress="restrictToNumbers(event)">
-            <input type="text" id="details" placeholder="Enter payment details">
-            <p id="withdraw-status"></p>
-            <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
-        </div>
-
-        <div class="page about-page" id="about">
-            <h2>About LBBD Community</h2>
-            <p>
-                LBBD COMMUNITY is pioneering the Tap-2-Earn revolution in Bangladesh, inspired by projects like Hamster Kombat.
-                Our mission is to empower users through innovative, rewarding, and engaging platforms.
-                This referral web app is just the beginning — join us to support our journey and unlock exciting Tap-2-Earn bots and more!
-            </p>
-            <p>Join our Telegram: <a href="https://t.me/LBBD_MINING_OFFICIAL" target="_blank">t.me/LBBD_MINING_OFFICIAL</a></p>
-            <div class="notice">
-                <span>Like Hamster Kombat and other Tap-2-Earn projects, LBBD COMMUNITY is launching Tap-2-Earn bots in Bangladesh. This referral web app is just our first step — support us and more will come!</span>
-            </div>
-        </div>
-
-        <div class="page admin-page" id="admin">
-            <h2>Admin Panel</h2>
-            <p id="admin-access-message"></p>
-            <div class="user-list" id="user-list">
-                <!-- User list will be populated here -->
-            </div>
-            <h2>Withdraw Requests</h2>
-            <div class="withdraw-list" id="withdraw-list">
-                <!-- Withdraw requests will be populated here -->
-            </div>
-        </div>
-    </div>
-
-    <div class="nav" id="nav">
-        <button id="nav-balance">Balance</button>
-        <button id="nav-invite">Invite Friends</button>
-        <button id="nav-withdraw">Withdraw</button>
-        <button id="nav-about">About</button>
-        <button id="nav-admin" style="display: none;">Admin</button>
-    </div>
-
-    <div class="popup" id="popup" style="display: none;">
-        <p id="popup-message"></p>
-        <button onclick="closePopup()">OK</button>
-    </div>
-
-    <script>
-        // Wait for the DOM and scripts to load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if Firebase is loaded
-            if (typeof firebase === 'undefined') {
-                document.getElementById('popup-message').textContent = 'Error: Failed to load Firebase. Please check your internet connection and try again.';
-                document.getElementById('popup').style.display = 'block';
-                return;
-            }
-
-            // Initialize Firebase with your config
-            const firebaseConfig = {
-                apiKey: "AIzaSyDf5KLqs-Snk_ShuoD6oo8A7KBjl8hbKU0",
-                authDomain: "lbbd-community-658cd.firebaseapp.com",
-                projectId: "lbbd-community-658cd",
-                storageBucket: "lbbd-community-658cd.firebasestorage.app",
-                messagingSenderId: "1036805634476",
-                appId: "1:1036805634476:web:7db1862c7acc8fd7796209"
-            };
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-
-            // Enhanced Particle Animation
-            const canvas = document.getElementById('particles');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            for (let i = 0; i < 200; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 3 + 1,
-                    vx: Math.random() * 0.7 - 0.35,
-                    vy: Math.random() * 0.7 - 0.35,
-                    color: `hsl(${Math.random() * 60 + 270}, 80%, 85%)`
-                });
-            }
-
-            function animateParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = p.color;
-                    ctx.fill();
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                });
-                ctx.shadowBlur = 0;
-                requestAnimationFrame(animateParticles);
-            }
-            animateParticles();
-
-            // Restrict Amount Input to Numbers
-            function restrictToNumbers(event) {
-                const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Enter', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                if (!allowedKeys.includes(event.key)) {
-                    event.preventDefault();
-                    const input = event.target;
-                    input.classList.add('invalid');
-                    setTimeout(() => input.classList.remove('invalid'), 500);
-                }
-            }
-
-            // App Logic
-            let balance = 0;
-            let friendsInvited = 0;
-            let currentUser = null;
-            const telegramChannel = 'https://t.me/LBBD_MINING_OFFICIAL';
-            const baseReferralUrl = 'https://lbbd-community.com/refer?code=';
-
-            // Admin Telegram ID
-            const adminTelegramId = '6672573765';
-
-            // Initialize Telegram Web App
-            const Telegram = window.Telegram;
-            if (Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                currentUser = Telegram.WebApp.initDataUnsafe.user;
-                if (currentUser && currentUser.id.toString() === adminTelegramId) {
-                    document.getElementById('nav-admin').style.display = 'block';
-                }
-            }
-
-            // Generate unique referral code
-            function generateReferralCode() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                let code = '';
-                for (let i = 0; i < 8; i++) {
-                    code += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return code;
-            }
-
-            // Initialize user in Firestore
-            async function initializeUser() {
-                if (!currentUser) return;
-                const userRef = db.collection('users').doc(currentUser.id.toString());
-                const userDoc = await userRef.get();
-                if (!userDoc.exists) {
-                    const referralCode = generateReferralCode();
-                    await userRef.set({
-                        telegramId: currentUser.id,
-                        username: currentUser.username || 'Anonymous',
-                        coins: 0,
-                        referralLink: `${baseReferralUrl}${referralCode}`,
-                        invitedUsers: [],
-                        isBanned: false,
-                        withdrawalHistory: []
-                    });
-                }
-                const userData = (await userRef.get()).data();
-                balance = userData.coins;
-                friendsInvited = userData.invitedUsers.length;
-                document.getElementById('balance-amount').textContent = `${balance} Coins`;
-                document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
-                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-            }
-
-            // Simulate friend joining
-            async function friendJoined() {
-                if (!currentUser) return;
-                friendsInvited++;
-                balance++;
-                const userRef = db.collection('users').doc(currentUser.id.toString());
-                await userRef.update({
-                    coins: balance,
-                    invitedUsers: firebase.firestore.FieldValue.arrayUnion('NewFriend')
-                });
-                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-                document.getElementById('balance-amount').textContent = `${balance} Coins`;
-                document.getElementById('invite-status').textContent = `Friend joined! You earned 1 coin.`;
-                showPopup('A friend joined using your link! You earned 1 coin.');
-            }
-
-            // Page navigation
-            function showPage(pageId) {
-                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
-            }
-
-            // Add event listeners for navigation buttons
-            document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
-            document.getElementById('nav-invite').addEventListener('click', () => showPage('invite'));
-            document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
-            document.getElementById('nav-about').addEventListener('click', () => showPage('about'));
-            document.getElementById('nav-admin').addEventListener('click', () => {
-                if (currentUser && currentUser.id.toString() === adminTelegramId) {
-                    showPage('admin');
-                    loadAdminPanel();
-                } else {
-                    showPopup('Access denied: Admin only.');
-                }
-            });
-
-            // Show popup
-            function showPopup(message) {
-                document.getElementById('popup-message').textContent = message;
-                document.getElementById('popup').style.display = 'block';
-            }
-
-            // Close popup
-            function closePopup() {
-                document.getElementById('popup').style.display = 'none';
-            }
-
-            // Share Telegram link
-            function shareTelegram() {
-                const shareText = `Join LBBD COMMUNITY and earn rewards! Use my referral link: ${referralLink}`;
-                const shareUrl = `tg://msg?text=${encodeURIComponent(shareText)}`;
-                window.open(shareUrl, '_blank');
-
-                // Fallback for browsers
-                setTimeout(() => {
-                    if (!document.hasFocus()) return;
-                    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
-                    window.open(fallbackUrl, '_blank');
-                }, 500);
-
-                document.getElementById('invite-status').textContent = 'Invite sent! Waiting for friend to join...';
-            }
-
-            // Payment method selection
-            const methodSelect = document.getElementById('method');
-            const detailsInput = document.getElementById('details');
-            methodSelect.addEventListener('change', () => {
-                const selectedMethod = methodSelect.value;
-                detailsInput.value = `${selectedMethod}: `;
-                detailsInput.placeholder = `Enter ${selectedMethod} details`;
-            });
-
-            // Ensure method prefix persists
-            detailsInput.addEventListener('input', () => {
-                const selectedMethod = methodSelect.value;
-                if (!detailsInput.value.startsWith(`${selectedMethod}: `)) {
-                    detailsInput.value = `${selectedMethod}: ` + detailsInput.value;
-                }
-            });
-
-            // Handle withdrawal
-            async function withdraw() {
-                if (!currentUser) return;
-                if (balance === 0) {
-                    showPopup('You have no coins to withdraw!');
-                    return;
-                }
-
-                const amount = document.getElementById('amount').value;
-                const method = document.getElementById('method').value;
-                const details = document.getElementById('details').value;
-
-                if (!amount || !details || details === `${method}: `) {
-                    showPopup('Please fill all fields.');
-                    return;
-                }
-
-                if (amount > balance) {
-                    showPopup('Insufficient balance.');
-                    return;
-                }
-
-                await db.collection('withdraw_requests').add({
-                    telegramId: currentUser.id,
-                    username: currentUser.username || 'Anonymous',
-                    amount: parseInt(amount),
-                    method,
-                    details,
-                    status: 'Pending',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                balance -= amount;
-                const userRef = db.collection('users').doc(currentUser.id.toString());
-                await userRef.update({
-                    coins: balance,
-                    withdrawalHistory: firebase.firestore.FieldValue.arrayUnion({
-                        amount: parseInt(amount),
-                        method,
-                        details,
-                        status: 'Pending',
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
-                document.getElementById('withdraw-status').textContent = 'Withdrawal Pending - Please wait 24 hours.';
-                document.getElementById('balance-amount').textContent = `${balance} Coins`;
-                document.getElementById('amount').value = '';
-                document.getElementById('details').value = `${method}: `;
-            }
-
-            // Admin Panel Logic
-            async function loadAdminPanel() {
-                if (!currentUser || currentUser.id.toString() !== adminTelegramId) {
-                    document.getElementById('admin-access-message').textContent = 'Access denied: Admin only.';
-                    return;
-                }
-                document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
-
-                // Load users
-                const userList = document.getElementById('user-list');
-                userList.innerHTML = '';
-                const usersSnapshot = await db.collection('users').get();
-                usersSnapshot.forEach(doc => {
-                    const user = doc.data();
-                    const userItem = document.createElement('div');
-                    userItem.className = 'user-item';
-                    userItem.innerHTML = `
-                        <p>Telegram ID: ${user.telegramId}</p>
-                        <p>Username: ${user.username}</p>
-                        <p>Coins: ${user.coins}</p>
-                        <p>Referral Link: ${user.referralLink}</p>
-                        <p>Invited Users: ${user.invitedUsers.join(', ') || 'None'}</p>
-                        <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
-                        <p>Withdrawal History: ${user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') || 'None'}</p>
-                        <button onclick="adjustCoins('${doc.id}', 10)">+10 Coins</button>
-                        <button onclick="adjustCoins('${doc.id}', -10)">-10 Coins</button>
-                        <button onclick="resetReferralLink('${doc.id}')">Reset Referral Link</button>
-                        <button onclick="toggleBan('${doc.id}', ${user.isBanned})">${user.isBanned ? 'Unban' : 'Ban'}</button>
-                    `;
-                    userList.appendChild(userItem);
-                });
-
-                // Load withdraw requests
-                const withdrawList = document.getElementById('withdraw-list');
-                withdrawList.innerHTML = '';
-                const withdrawSnapshot = await db.collection('withdraw_requests').get();
-                withdrawSnapshot.forEach(doc => {
-                    const request = doc.data();
-                    const withdrawItem = document.createElement('div');
-                    withdrawItem.className = 'withdraw-item';
-                    withdrawItem.innerHTML = `
-                        <p>Username: ${request.username}</p>
-                        <p>Amount: ${request.amount} Coins</p>
-                        <p>Method: ${request.method}</p>
-                        <p>Details: ${request.details}</p>
-                        <p>Status: ${request.status}</p>
-                        <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                        <button onclick="updateWithdrawStatus('${doc.id}', 'Paid')">Mark as Paid</button>
-                        <button onclick="updateWithdrawStatus('${doc.id}', 'Cancelled')">Mark as Cancelled</button>
-                    `;
-                    withdrawList.appendChild(withdrawItem);
-                });
-            }
-
-            async function adjustCoins(userId, amount) {
-                const userRef = db.collection('users').doc(userId);
-                await userRef.update({
-                    coins: firebase.firestore.FieldValue.increment(amount)
-                });
-                loadAdminPanel();
-                showPopup(`Adjusted coins by ${amount} for user ${userId}`);
-            }
-
-            async function resetReferralLink(userId) {
-                const newCode = generateReferralCode();
-                const userRef = db.collection('users').doc(userId);
-                await userRef.update({
-                    referralLink: `${baseReferralUrl}${newCode}`
-                });
-                loadAdminPanel();
-                showPopup(`Reset referral link for user ${userId}`);
-            }
-
-            async function toggleBan(userId, isBanned) {
-                const userRef = db.collection('users').doc(userId);
-                await userRef.update({
-                    isBanned: !isBanned
-                });
-                loadAdminPanel();
-                showPopup(`User ${userId} ${isBanned ? 'unbanned' : 'banned'}`);
-            }
-
-            async function updateWithdrawStatus(requestId, status) {
-                const requestRef = db.collection('withdraw_requests').doc(requestId);
-                const request = (await requestRef.get()).data();
-                await requestRef.update({ status });
-                const userRef = db.collection('users').doc(request.telegramId.toString());
-                const user = (await userRef.get()).data();
-                const updatedHistory = user.withdrawalHistory.map(w => 
-                    w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status } : w
-                );
-                await userRef.update({ withdrawalHistory: updatedHistory });
-                loadAdminPanel();
-                showPopup(`Withdrawal request marked as ${status}`);
-            }
-
-            // Remove splash screen and initialize
-            setTimeout(() => {
-                document.getElementById('splash').remove();
-                showPage('balance');
-                initializeUser();
-            }, 4000);
-
-            // Resize canvas on window resize
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        });
-    </script>
-</body>
-</html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>LBBD COMMUNITY</title>
+       <!-- Firebase SDK (using compat for older namespace support) -->
+       <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+       <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+       <style>
+           * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+               font-family: 'Segoe UI', Arial, sans-serif;
+           }
+
+           body {
+               background: linear-gradient(135deg, #0a0a25, #250a45);
+               color: #fff;
+               overflow-x: hidden;
+               min-height: 100vh;
+               position: relative;
+           }
+
+           /* Particle Background */
+           canvas#particles {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               z-index: -1;
+               opacity: 0.5;
+           }
+
+           /* Splash Screen */
+           .splash {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100vh;
+               background: linear-gradient(135deg, #8a00ff, #c200ff);
+               display: flex;
+               flex-direction: column;
+               justify-content: center;
+               align-items: center;
+               z-index: 1000;
+               animation: fadeOut 1s ease-in-out 3s forwards;
+           }
+
+           .splash h1 {
+               font-size: 8vw;
+               text-transform: uppercase;
+               letter-spacing: 0.7rem;
+               background: linear-gradient(45deg, #fff, #ffd700);
+               -webkit-background-clip: text;
+               background-clip: text;
+               color: transparent;
+               animation: pulse Zarvis infinite;
+               text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 15px #ffd700;
+           }
+
+           .splash p {
+               position: absolute;
+               bottom: 2rem;
+               font-size: 1rem;
+               color: #ffd700;
+               opacity: 0.9;
+               animation: slideUp 1s ease-in-out;
+           }
+
+           @keyframes pulse {
+               0% { transform: scale(1); }
+               50% { transform: scale(1.1); }
+               100% { transform: scale(1); }
+           }
+
+           @keyframes fadeOut {
+               to { opacity: 0; visibility: hidden; }
+           }
+
+           @keyframes slideUp {
+               from { transform: translateY(40px); opacity: 0; }
+               to { transform: translateY(0); opacity: 0.9; }
+           }
+
+           /* Main App */
+           .app {
+               max-width: 600px;
+               margin: 2rem auto 7rem;
+               padding: 1.5rem;
+               opacity: 0;
+               animation: fadeIn 1s ease-in-out 3.5s forwards;
+           }
+
+           @keyframes fadeIn {
+               to { opacity: 1; }
+           }
+
+           .page {
+               display: none;
+               background: rgba(255, 255, 255, 0.1);
+               border-radius: 30px;
+               padding: 2rem;
+               margin-bottom: 1.5rem;
+               backdrop-filter: blur(25px);
+               box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+               border: 1px solid rgba(255, 255, 255, 0.2);
+               animation: slideIn 0.7s ease-in-out;
+               transition: transform 0.4s;
+           }
+
+           .page.active {
+               display: block;
+           }
+
+           @keyframes slideIn {
+               from { transform: translateY(80px) scale(0.9); opacity: 0; }
+               to { transform: translateY(0) scale(1); opacity: 1; }
+           }
+
+           h2 {
+               font-size: 1.7rem;
+               margin-bottom: 1.3rem;
+               color: #ffd700;
+               text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+           }
+
+           .balance-page p {
+               font-size: 2.3rem;
+               font-weight: bold;
+               background: linear-gradient(45deg, #ffd700, #fff);
+               -webkit-background-clip: text;
+               background-clip: text;
+               color: transparent;
+               text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+           }
+
+           .balance-page p:nth-child(3),
+           .invite-page p,
+           .withdraw-page p,
+           .about-page p,
+           .admin-page p {
+               font-size: 1rem;
+               color: #e6e6ff;
+               text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+           }
+
+           .about-page a {
+               color: #ffd700;
+               text-decoration: none;
+               transition: color 0.3s, text-shadow 0.3s;
+           }
+
+           .about-page a:hover {
+               color: #fff;
+               text-shadow: 0 0 12px #ffd700;
+           }
+
+           /* 3D Button Styling with Click Animation */
+           button {
+               background: linear-gradient(45deg, #8a00ff, #c200ff);
+               border: none;
+               padding: 0.8rem 1.8rem;
+               color: #fff;
+               font-size: 1rem;
+               border-radius: 30px;
+               cursor: pointer;
+               position: relative;
+               transform: translateZ(0);
+               transition: transform 0.3s, box-shadow 0.3s;
+               box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+               overflow: hidden;
+           }
+
+           button::before {
+               content: '';
+               position: absolute;
+               top: 0;
+               left: 0;
+               right: 0;
+               bottom: 0;
+               background: linear-gradient(45deg, #6a00cc, #a100cc);
+               border-radius: 30px;
+               transform: translateZ(-20px);
+               z-index: -1;
+               box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+               transition: transform 0.3s;
+           }
+
+           button::after {
+               content: '';
+               position: absolute;
+               top: 50%;
+               left: 50%;
+               width: 0;
+               height: 0;
+               background: rgba(255, 255, 255, 0.3);
+               border-radius: 50%;
+               transform: translate(-50%, -50%);
+               transition: width 0.4s, height 0.4s;
+               z-index: 0;
+           }
+
+           button:hover {
+               transform: translateY(-6px) translateZ(25px) rotateX(12deg);
+               box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+           }
+
+           button:hover::before {
+               transform: translateY(4px) translateZ(-15px);
+           }
+
+           button:active::after {
+               width: 200px;
+               height: 200px;
+               transition: width 0.4s ease-out, height 0.4s ease-out;
+           }
+
+           button:active {
+               transform: translateY(0) translateZ(0) scale(0.95);
+               box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+           }
+
+           /* Prominent Action Buttons */
+           .invite-page .action-button,
+           .withdraw-page .action-button {
+               display: block;
+               margin: 2rem auto 0;
+               padding: 1.1rem 2.2rem;
+               font-size: 1.2rem;
+               box-shadow: 0 10px 30px rgba(138, 0, 255, 0.6);
+           }
+
+           .invite-page .action-button::before,
+           .withdraw-page .action-button::before {
+               box-shadow: 0 10px 30px rgba(138, 0, 255, 0.7);
+           }
+
+           /* Premium Text Inputs */
+           input {
+               width: 100%;
+               padding: 0.9rem;
+               margin: 0.7rem 0;
+               border-radius: 15px;
+               border: none;
+               background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+               color: #e6e6ff;
+               font-size: 1rem;
+               box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(138, 0, 255, 0.3);
+               transition: box-shadow 0.3s, transform 0.3s;
+               position: relative;
+           }
+
+           select {
+               width: 100%;
+               padding: 0.9rem;
+               margin: 0.7rem 0;
+               border-radius: 15px;
+               border: 1px solid rgba(138, 0, 255, 0.5);
+               background: linear-gradient(45deg, rgba(40, 10, 80, 0.9), rgba(80, 20, 120, 0.7));
+               color: #ffd700;
+               font-size: 1rem;
+               box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(138, 0, 255, 0.4);
+               transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+               appearance: none;
+               background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23ffd700" d="M2 4l4 4 4-4H2z"/></svg>');
+               background-repeat: no-repeat;
+               background-position: right 1rem center;
+               background-size: 12px;
+               cursor: pointer;
+           }
+
+           select:focus, input:focus {
+               outline: none;
+               box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.7);
+               transform: scale(1.02);
+               border-color: #ffd700;
+           }
+
+           select:hover {
+               box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 215, 0, 0.5);
+               border-color: #ffd700;
+           }
+
+           select option {
+               background: #0a0a25;
+               color: #fff;
+               font-size: 1rem;
+               padding: 0.5rem;
+           }
+
+           select option[value="bKash"] {
+               color: #ff4d4d; /* Vibrant red for bKash */
+           }
+
+           select option[value="Nagad"] {
+               color: #00cc00; /* Bright green for Nagad */
+           }
+
+           select option[value="Binance"] {
+               color: #f0b90b; /* Binance yellow */
+           }
+
+           select option[value="Crypto"] {
+               color: #00b7eb; /* Cyan for Crypto */
+           }
+
+           input::placeholder {
+               color: #ccc;
+               opacity: 0.8;
+           }
+
+           /* Amount Input Validation */
+           input#amount.invalid {
+               box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7);
+           }
+
+           /* Input Cursor Glow */
+           input:focus::after {
+               content: '';
+               position: absolute;
+               width: 2px;
+               height: 1.2rem;
+               background: #ffd700;
+               animation: cursorGlow 1s infinite;
+               right: 1rem;
+               top: 50%;
+               transform: translateY(-50%);
+           }
+
+           @keyframes cursorGlow {
+               0% { opacity: 1; }
+               50% { opacity: 0.3; }
+               100% { opacity: 1; }
+           }
+
+           /* Popup */
+           .popup {
+               position: fixed;
+               top: 50%;
+               left: 50%;
+               transform: translate(-50%, -50%) scale(0);
+               background: rgba(0, 0, 0, 0.95);
+               padding: 2rem;
+               border-radius: 30px;
+               text-align: center;
+               z-index: 2000;
+               backdrop-filter: blur(20px);
+               box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
+               border: 1px solid rgba(255, 255, 255, 0.25);
+               animation: popupShow 0.5s ease-in-out forwards;
+           }
+
+           .popup p {
+               margin-bottom: 1.3rem;
+               font-size: 1rem;
+               color: #e6e6ff;
+               text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+           }
+
+           @keyframes popupShow {
+               to { transform: translate(-50%, -50%) scale(1); }
+           }
+
+           .popup button {
+               padding: 0.7rem 1.3rem;
+           }
+
+           /* Bottom Navigation */
+           .nav {
+               position: fixed;
+               bottom: 0;
+               left: 0;
+               right: 0;
+               display: flex;
+               justify-content: space-around;
+               background: rgba(255, 255, 255, 0.1);
+               backdrop-filter: blur(25px);
+               border-top: 1px solid rgba(255, 255, 255, 0.2);
+               padding: 0.7rem;
+               box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5);
+               z-index: 100;
+           }
+
+           .nav button {
+               flex: 1;
+               margin: 0 0.5rem;
+               font-size: 0.9rem;
+               padding: 1rem;
+           }
+
+           /* About Page Notice Animation */
+           .notice {
+               text-align: center;
+               font-size: 0.9rem;
+               color: #e6e6ff;
+               opacity: 0.9;
+               margin-top: 1.5rem;
+               overflow: hidden;
+               white-space: nowrap;
+               position: relative;
+               text-shadow: 0 0 10px rgba(138, 0, 255, 0.5);
+           }
+
+           .notice span {
+               display: inline-block;
+               animation: slideRightToLeft 20s linear infinite;
+           }
+
+           .notice::before,
+           .notice::after {
+               content: '';
+               position: absolute;
+               top: 0;
+               width: 25%;
+               height: 100%;
+               z-index: 1;
+           }
+
+           .notice::before {
+               left: 0;
+               background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent);
+           }
+
+           .notice::after {
+               right: 0;
+               background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent);
+           }
+
+           @keyframes slideRightToLeft {
+               0% { transform: translateX(100%); }
+               100% { transform: translateX(-100%); }
+           }
+
+           /* Admin Panel Styles */
+           .admin-page .user-list, .admin-page .withdraw-list {
+               margin-top: 1rem;
+           }
+
+           .admin-page .user-item, .admin-page .withdraw-item {
+               background: rgba(255, 251, 255, 0.05);
+               padding: 1rem;
+               margin-bottom: 1rem;
+               border-radius: 15px;
+               border: 1px solid rgba(255, 255, 255, 0.1);
+           }
+
+           .admin-page .user-item p, .admin-page .withdraw-item p {
+               margin: 0.5rem 0;
+           }
+
+           .admin-page .user-item button, .admin-page .withdraw-item button {
+               margin: 0.3rem 0.5rem 0 0;
+               padding: 0.5rem 1rem;
+               font-size: 0.9rem;
+           }
+
+           /* Responsive Design */
+           @media (max-width: 600px) {
+               .splash h1 {
+                   font-size: 6vw;
+               }
+
+               .splash p {
+                   font-size: 0.8rem;
+               }
+
+               h2 {
+                   font-size: 1.4rem;
+               }
+
+               .balance-page p {
+                   font-size: 1.8rem;
+               }
+
+               .balance-page p:nth-child(3),
+               .invite-page p,
+               .withdraw-page p,
+               .about-page p,
+               .admin-page p {
+                   font-size: 0.9rem;
+               }
+
+               button {
+                   font-size: 0.9rem;
+                   padding: 0.7rem 1.3rem;
+               }
+
+               .invite-page .action-button,
+               .withdraw-page .action-button {
+                   font-size: 1.1rem;
+                   padding: 0.9rem 1.8rem;
+               }
+
+               select, input {
+                   font-size: 0.9rem;
+               }
+
+               .nav button {
+                   font-size: 0.8rem;
+                   padding: 0.8rem;
+               }
+
+               .popup p {
+                   font-size: 0.9rem;
+               }
+
+               .notice {
+                   font-size: 0.8rem;
+               }
+
+               .admin-page .user-item button, .admin-page .withdraw-item button {
+                   font-size: 0.8rem;
+                   padding: 0.5rem 0.8rem;
+               }
+           }
+
+           @media (max-width: 400px) {
+               .nav {
+                   flex-direction: column;
+                   align-items: center;
+               }
+
+               .nav button {
+                   margin: 0.5rem 0;
+                   width: 90%;
+               }
+
+               .app {
+                   padding: 1rem;
+                   margin-bottom: 10rem;
+               }
+           }
+       </style>
+   </head>
+   <body>
+       <canvas id="particles"></canvas>
+
+       <div class="splash" id="splash">
+           <h1>LBBD COMMUNITY</h1>
+           <p>@Developed by LBBD COMMUNITY</p>
+       </div>
+
+       <div class="app" id="app">
+           <div class="page balance-page" id="balance">
+               <h2>Your Balance</h2>
+               <p id="balance-amount">0 Coins</p>
+               <p>Current coin value: To be announced soon!</p>
+           </div>
+
+           <div class="page invite-page" id="invite">
+               <h2>Invite Friends</h2>
+               <p>Share your unique referral link and earn 1 coin per friend who joins!</p>
+               <p id="referral-link">Generating your link...</p>
+               <p id="friends-invited">Friends Invited: 0</p>
+               <p id="invite-status"></p>
+               <button class="action-button" onclick="shareTelegram()">Share Telegram Community</button>
+           </div>
+
+           <div class="page withdraw-page" id="withdraw">
+               <h2>Withdraw Coins</h2>
+               <p>Minimum withdrawal amount: To be announced soon!</p>
+               <select id="method">
+                   <option value="bKash">bKash</option>
+                   <option value="Nagad">Nagad</option>
+                   <option value="Binance">Binance</option>
+                   <option value="Crypto">Crypto</option>
+               </select>
+               <input type="number" id="amount" placeholder="Enter amount" min="1" onkeypress="restrictToNumbers(event)">
+               <input type="text" id="details" placeholder="Enter payment details">
+               <p id="withdraw-status"></p>
+               <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
+           </div>
+
+           <div class="page about-page" id="about">
+               <h2>About LBBD Community</h2>
+               <p>
+                   LBBD COMMUNITY is pioneering the Tap-2-Earn revolution in Bangladesh, inspired by projects like Hamster Kombat.
+                   Our mission is to empower users through innovative, rewarding, and engaging platforms.
+                   This referral web app is just the beginning — join us to support our journey and unlock exciting Tap-2-Earn bots and more!
+               </p>
+               <p>Join our Telegram: <a href="https://t.me/LBBD_MINING_OFFICIAL" target="_blank">t.me/LBBD_MINING_OFFICIAL</a></p>
+               <div class="notice">
+                   <span>Like Hamster Kombat and other Tap-2-Earn projects, LBBD COMMUNITY is launching Tap-2-Earn bots in Bangladesh. This referral web app is just our first step — support us and more will come!</span>
+               </div>
+           </div>
+
+           <div class="page admin-page" id="admin">
+               <h2>Admin Panel</h2>
+               <p id="admin-access-message"></p>
+               <div class="user-list" id="user-list">
+                   <!-- User list will be populated here -->
+               </div>
+               <h2>Withdraw Requests</h2>
+               <div class="withdraw-list" id="withdraw-list">
+                   <!-- Withdraw requests will be populated here -->
+               </div>
+           </div>
+       </div>
+
+       <div class="nav" id="nav">
+           <button id="nav-balance">Balance</button>
+           <button id="nav-invite">Invite Friends</button>
+           <button id="nav-withdraw">Withdraw</button>
+           <button id="nav-about">About</button>
+           <button id="nav-admin" style="display: none;">Admin</button>
+       </div>
+
+       <div class="popup" id="popup" style="display: none;">
+           <p id="popup-message"></p>
+           <button onclick="closePopup()">OK</button>
+       </div>
+
+       <script>
+           // Initialize Firebase with your config
+           try {
+               const firebaseConfig = {
+                   apiKey: "AIzaSyDf5KLqs-Snk_ShuoD6oo8A7KBjl8hbKU0",
+                   authDomain: "lbbd-community-658cd.firebaseapp.com",
+                   projectId: "lbbd-community-658cd",
+                   storageBucket: "lbbd-community-658cd.firebasestorage.app",
+                   messagingSenderId: "1036805634476",
+                   appId: "1:1036805634476:web:7db1862c7acc8fd7796209"
+               };
+               const app = firebase.initializeApp(firebaseConfig);
+               const db = firebase.firestore();
+               console.log('Firebase initialized successfully');
+           } catch (error) {
+               console.error('Firebase initialization error:', error);
+               showPopup('Error initializing Firebase. Check console for details.');
+           }
+
+           // Enhanced Particle Animation
+           const canvas = document.getElementById('particles');
+           const ctx = canvas.getContext('2d');
+           canvas.width = window.innerWidth;
+           canvas.height = window.innerHeight;
+
+           const particles = [];
+           for (let i = 0; i < 200; i++) {
+               particles.push({
+                   x: Math.random() * canvas.width,
+                   y: Math.random() * canvas.height,
+                   radius: Math.random() * 3 + 1,
+                   vx: Math.random() * 0.7 - 0.35,
+                   vy: Math.random() * 0.7 - 0.35,
+                   color: `hsl(${Math.random() * 60 + 270}, 80%, 85%)`
+               });
+           }
+
+           function animateParticles() {
+               ctx.clearRect(0, 0, canvas.width, canvas.height);
+               particles.forEach(p => {
+                   ctx.beginPath();
+                   ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                   ctx.fillStyle = p.color;
+                   ctx.shadowBlur = 15;
+                   ctx.shadowColor = p.color;
+                   ctx.fill();
+                   p.x += p.vx;
+                   p.y += p.vy;
+                   if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                   if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+               });
+               ctx.shadowBlur = 0;
+               requestAnimationFrame(animateParticles);
+           }
+           animateParticles();
+
+           // Restrict Amount Input to Numbers
+           function restrictToNumbers(event) {
+               const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Enter', 'ArrowLeft', 'ArrowRight', 'Delete'];
+               if (!allowedKeys.includes(event.key)) {
+                   event.preventDefault();
+                   const input = event.target;
+                   input.classList.add('invalid');
+                   setTimeout(() => input.classList.remove('invalid'), 500);
+               }
+           }
+
+           // App Logic
+           let balance = 0;
+           let friendsInvited = 0;
+           let currentUser = null;
+           const telegramChannel = 'https://t.me/LBBD_MINING_OFFICIAL';
+           const baseReferralUrl = 'https://lbbd-community.com/refer?code=';
+
+           // Admin Telegram ID
+           const adminTelegramId = '6672573765';
+
+           // Initialize Telegram Web App
+           const Telegram = window.Telegram;
+           if (Telegram && Telegram.WebApp) {
+               Telegram.WebApp.ready();
+               currentUser = Telegram.WebApp.initDataUnsafe.user;
+               // Debug: Show Telegram ID in a popup
+               if (currentUser) {
+                   showPopup(`Your Telegram ID: ${currentUser.id}`);
+               } else {
+                   showPopup('Unable to detect Telegram user ID.');
+               }
+               if (currentUser && currentUser.id.toString() === adminTelegramId) {
+                   document.getElementById('nav-admin').style.display = 'block';
+               }
+           }
+
+           // Generate unique referral code
+           function generateReferralCode() {
+               const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+               let code = '';
+               for (let i = 0; i < 8; i++) {
+                   code += chars.charAt(Math.floor(Math.random() * chars.length));
+               }
+               return code;
+           }
+
+           // Initialize user in Firestore
+           async function initializeUser() {
+               if (!currentUser || !db) return;
+               const userRef = db.collection('users').doc(currentUser.id.toString());
+               const userDoc = await userRef.get();
+               if (!userDoc.exists) {
+                   const referralCode = generateReferralCode();
+                   await userRef.set({
+                       telegramId: currentUser.id,
+                       username: currentUser.username || 'Anonymous',
+                       coins: 0,
+                       referralLink: `${baseReferralUrl}${referralCode}`,
+                       invitedUsers: [],
+                       isBanned: false,
+                       withdrawalHistory: []
+                   });
+               }
+               const userData = (await userRef.get()).data();
+               balance = userData.coins;
+               friendsInvited = userData.invitedUsers.length;
+               document.getElementById('balance-amount').textContent = `${balance} Coins`;
+               document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
+               document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+           }
+
+           // Simulate friend joining
+           async function friendJoined() {
+               if (!currentUser || !db) return;
+               friendsInvited++;
+               balance++;
+               const userRef = db.collection('users').doc(currentUser.id.toString());
+               await userRef.update({
+                   coins: balance,
+                   invitedUsers: firebase.firestore.FieldValue.arrayUnion('NewFriend')
+               });
+               document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+               document.getElementById('balance-amount').textContent = `${balance} Coins`;
+               document.getElementById('invite-status').textContent = `Friend joined! You earned 1 coin.`;
+               showPopup('A friend joined using your link! You earned 1 coin.');
+           }
+
+           // Page navigation
+           function showPage(pageId) {
+               document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+               document.getElementById(pageId).classList.add('active');
+           }
+
+           // Add event listeners for navigation buttons
+           document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
+           document.getElementById('nav-invite').addEventListener('click', () => showPage('invite'));
+           document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
+           document.getElementById('nav-about').addEventListener('click', () => showPage('about'));
+           document.getElementById('nav-admin').addEventListener('click', () => {
+               if (currentUser && currentUser.id.toString() === adminTelegramId) {
+                   showPage('admin');
+                   loadAdminPanel();
+               } else {
+                   showPopup('Access denied: Admin only.');
+               }
+           });
+
+           // Show popup
+           function showPopup(message) {
+               document.getElementById('popup-message').textContent = message;
+               document.getElementById('popup').style.display = 'block';
+           }
+
+           // Close popup
+           function closePopup() {
+               document.getElementById('popup').style.display = 'none';
+           }
+
+           // Share Telegram link
+           function shareTelegram() {
+               const shareText = `Join LBBD COMMUNITY and earn rewards! Use my referral link: ${referralLink}`;
+               const shareUrl = `tg://msg?text=${encodeURIComponent(shareText)}`;
+               window.open(shareUrl, '_blank');
+
+               // Fallback for browsers
+               setTimeout(() => {
+                   if (!document.hasFocus()) return;
+                   const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+                   window.open(fallbackUrl, '_blank');
+               }, 500);
+
+               document.getElementById('invite-status').textContent = 'Invite sent! Waiting for friend to join...';
+           }
+
+           // Payment method selection
+           const methodSelect = document.getElementById('method');
+           const detailsInput = document.getElementById('details');
+           methodSelect.addEventListener('change', () => {
+               const selectedMethod = methodSelect.value;
+               detailsInput.value = `${selectedMethod}: `;
+               detailsInput.placeholder = `Enter ${selectedMethod} details`;
+           });
+
+           // Ensure method prefix persists
+           detailsInput.addEventListener('input', () => {
+               const selectedMethod = methodSelect.value;
+               if (!detailsInput.value.startsWith(`${selectedMethod}: `)) {
+                   detailsInput.value = `${selectedMethod}: ` + detailsInput.value;
+               }
+           });
+
+           // Handle withdrawal
+           async function withdraw() {
+               if (!currentUser || !db) return;
+               if (balance === 0) {
+                   showPopup('You have no coins to withdraw!');
+                   return;
+               }
+
+               const amount = document.getElementById('amount').value;
+               const method = document.getElementById('method').value;
+               const details = document.getElementById('details').value;
+
+               if (!amount || !details || details === `${method}: `) {
+                   showPopup('Please fill all fields.');
+                   return;
+               }
+
+               if (amount > balance) {
+                   showPopup('Insufficient balance.');
+                   return;
+               }
+
+               await db.collection('withdraw_requests').add({
+                   telegramId: currentUser.id,
+                   username: currentUser.username || 'Anonymous',
+                   amount: parseInt(amount),
+                   method,
+                   details,
+                   status: 'Pending',
+                   timestamp: firebase.firestore.FieldValue.serverTimestamp()
+               });
+
+               balance -= amount;
+               const userRef = db.collection('users').doc(currentUser.id.toString());
+               await userRef.update({
+                   coins: balance,
+                   withdrawalHistory: firebase.firestore.FieldValue.arrayUnion({
+                       amount: parseInt(amount),
+                       method,
+                       details,
+                       status: 'Pending',
+                       timestamp: new Date().toISOString()
+                   })
+               });
+
+               document.getElementById('withdraw-status').textContent = 'Withdrawal Pending - Please wait 24 hours.';
+               document.getElementById('balance-amount').textContent = `${balance} Coins`;
+               document.getElementById('amount').value = '';
+               document.getElementById('details').value = `${method}: `;
+           }
+
+           // Admin Panel Logic
+           async function loadAdminPanel() {
+               if (!currentUser || !db || currentUser.id.toString() !== adminTelegramId) {
+                   document.getElementById('admin-access-message').textContent = 'Access denied: Admin only.';
+                   return;
+               }
+               document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
+
+               // Load users
+               const userList = document.getElementById('user-list');
+               userList.innerHTML = '';
+               const usersSnapshot = await db.collection('users').get();
+               usersSnapshot.forEach(doc => {
+                   const user = doc.data();
+                   const userItem = document.createElement('div');
+                   userItem.className = 'user-item';
+                   userItem.innerHTML = `
+                       <p>Telegram ID: ${user.telegramId}</p>
+                       <p>Username: ${user.username}</p>
+                       <p>Coins: ${user.coins}</p>
+                       <p>Referral Link: ${user.referralLink}</p>
+                       <p>Invited Users: ${user.invitedUsers.join(', ') || 'None'}</p>
+                       <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
+                       <p>Withdrawal History: ${user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') || 'None'}</p>
+                       <button onclick="adjustCoins('${doc.id}', 10)">+10 Coins</button>
+                       <button onclick="adjustCoins('${doc.id}', -10)">-10 Coins</button>
+                       <button onclick="resetReferralLink('${doc.id}')">Reset Referral Link</button>
+                       <button onclick="toggleBan('${doc.id}', ${user.isBanned})">${user.isBanned ? 'Unban' : 'Ban'}</button>
+                   `;
+                   userList.appendChild(userItem);
+               });
+
+               // Load withdraw requests
+               const withdrawList = document.getElementById('withdraw-list');
+               withdrawList.innerHTML = '';
+               const withdrawSnapshot = await db.collection('withdraw_requests').get();
+               withdrawSnapshot.forEach(doc => {
+                   const request = doc.data();
+                   const withdrawItem = document.createElement('div');
+                   withdrawItem.className = 'withdraw-item';
+                   withdrawItem.innerHTML = `
+                       <p>Username: ${request.username}</p>
+                       <p>Amount: ${request.amount} Coins</p>
+                       <p>Method: ${request.method}</p>
+                       <p>Details: ${request.details}</p>
+                       <p>Status: ${request.status}</p>
+                       <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+                       <button onclick="updateWithdrawStatus('${doc.id}', 'Paid')">Mark as Paid</button>
+                       <button onclick="updateWithdrawStatus('${doc.id}', 'Cancelled')">Mark as Cancelled</button>
+                   `;
+                   withdrawList.appendChild(withdrawItem);
+               });
+           }
+
+           async function adjustCoins(userId, amount) {
+               if (!db) return;
+               const userRef = db.collection('users').doc(userId);
+               await userRef.update({
+                   coins: firebase.firestore.FieldValue.increment(amount)
+               });
+               loadAdminPanel();
+               showPopup(`Adjusted coins by ${amount} for user ${userId}`);
+           }
+
+           async function resetReferralLink(userId) {
+               if (!db) return;
+               const newCode = generateReferralCode();
+               const userRef = db.collection('users').doc(userId);
+               await userRef.update({
+                   referralLink: `${baseReferralUrl}${newCode}`
+               });
+               loadAdminPanel();
+               showPopup(`Reset referral link for user ${userId}`);
+           }
+
+           async function toggleBan(userId, isBanned) {
+               if (!db) return;
+               const userRef = db.collection('users').doc(userId);
+               await userRef.update({
+                   isBanned: !isBanned
+               });
+               loadAdminPanel();
+               showPopup(`User ${userId} ${isBanned ? 'unbanned' : 'banned'}`);
+           }
+
+           async function updateWithdrawStatus(requestId, status) {
+               if (!db) return;
+               const requestRef = db.collection('withdraw_requests').doc(requestId);
+               const request = (await requestRef.get()).data();
+               await requestRef.update({ status });
+               const userRef = db.collection('users').doc(request.telegramId.toString());
+               const user = (await userRef.get()).data();
+               const updatedHistory = user.withdrawalHistory.map(w => 
+                   w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status } : w
+               );
+               await userRef.update({ withdrawalHistory: updatedHistory });
+               loadAdminPanel();
+               showPopup(`Withdrawal request marked as ${status}`);
+           }
+
+           // Remove splash screen and initialize
+           setTimeout(() => {
+               document.getElementById('splash').remove();
+               showPage('balance');
+               initializeUser();
+           }, 4000);
+
+           // Resize canvas on window resize
+           window.addEventListener('resize', () => {
+               canvas.width = window.innerWidth;
+               canvas.height = window.innerHeight;
+           });
+       </script>
+   </body>
+   </html>
+   
