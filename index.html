@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LBBD COMMUNITY</title>
-    <!-- Firebase SDK (using compat for older namespace support) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
@@ -23,7 +22,6 @@
             position: relative;
         }
 
-        /* Particle Background */
         canvas#particles {
             position: fixed;
             top: 0;
@@ -34,7 +32,6 @@
             opacity: 0.5;
         }
 
-        /* Splash Screen */
         .splash {
             position: fixed;
             top: 0;
@@ -71,22 +68,10 @@
             animation: slideUp 1s ease-in-out;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 0.9; } }
 
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 0.9; }
-        }
-
-        /* Main App */
         .app {
             max-width: 600px;
             margin: 2rem auto 7rem;
@@ -95,9 +80,7 @@
             animation: fadeIn 1s ease-in-out 3.5s forwards;
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { to { opacity: 1; } }
 
         .page {
             display: none;
@@ -112,14 +95,9 @@
             transition: transform 0.4s;
         }
 
-        .page.active {
-            display: block;
-        }
+        .page.active { display: block; }
 
-        @keyframes slideIn {
-            from { transform: translateY(80px) scale(0.9); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateY(80px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
         h2 {
             font-size: 1.7rem;
@@ -159,7 +137,6 @@
             text-shadow: 0 0 12px #ffd700;
         }
 
-        /* 3D Button Styling with Click Animation */
         button {
             background: linear-gradient(45deg, #8a00ff, #c200ff);
             border: none;
@@ -173,6 +150,7 @@
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent; /* Disable Telegram's default tap highlight */
         }
 
         button::before {
@@ -224,7 +202,14 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Prominent Action Buttons */
+        /* Override Telegram's default tap highlight */
+        button:focus,
+        button:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(45deg, #8a00ff, #c200ff); /* Maintain our gradient */
+        }
+
         .invite-page .action-button,
         .withdraw-page .action-button {
             display: block;
@@ -239,7 +224,6 @@
             box-shadow: 0 10px 30px rgba(138, 0, 255, 0.7);
         }
 
-        /* Premium Text Inputs */
         input {
             width: 100%;
             padding: 0.9rem;
@@ -251,7 +235,6 @@
             font-size: 1rem;
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(138, 0, 255, 0.3);
             transition: box-shadow 0.3s, transform 0.3s;
-            position: relative;
         }
 
         select {
@@ -292,30 +275,13 @@
             padding: 0.5rem;
         }
 
-        select option[value="bKash"] {
-            color: #ff4d4d;
-        }
+        select option[value="bKash"] { color: #ff4d4d; }
+        select option[value="Nagad"] { color: #00cc00; }
+        select option[value="Binance"] { color: #f0b90b; }
+        select option[value="Crypto"] { color: #00b7eb; }
 
-        select option[value="Nagad"] {
-            color: #00cc00;
-        }
-
-        select option[value="Binance"] {
-            color: #f0b90b;
-        }
-
-        select option[value="Crypto"] {
-            color: #00b7eb;
-        }
-
-        input::placeholder {
-            color: #ccc;
-            opacity: 0.8;
-        }
-
-        input#amount.invalid {
-            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7);
-        }
+        input::placeholder { color: #ccc; opacity: 0.8; }
+        input#amount.invalid { box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7); }
 
         input:focus::after {
             content: '';
@@ -329,13 +295,8 @@
             transform: translateY(-50%);
         }
 
-        @keyframes cursorGlow {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+        @keyframes cursorGlow { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* Popup */
         .popup {
             position: fixed;
             top: 50%;
@@ -352,22 +313,10 @@
             animation: popupShow 0.5s ease-in-out forwards;
         }
 
-        .popup p {
-            margin-bottom: 1.3rem;
-            font-size: 1rem;
-            color: #e6e6ff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
+        .popup p { margin-bottom: 1.3rem; font-size: 1rem; color: #e6e6ff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+        @keyframes popupShow { to { transform: translate(-50%, -50%) scale(1); } }
+        .popup button { padding: 0.7rem 1.3rem; }
 
-        @keyframes popupShow {
-            to { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .popup button {
-            padding: 0.7rem 1.3rem;
-        }
-
-        /* Bottom Navigation */
         .nav {
             position: fixed;
             bottom: 0;
@@ -385,12 +334,19 @@
 
         .nav button {
             flex: 1;
-            margin: 0 0.5rem;
-            font-size: 0.9rem;
-            padding: 1rem;
+            margin: 0 0.2rem;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            text-align: center;
+            white-space: nowrap;
         }
 
-        /* About Page Notice Animation */
+        .nav.admin-active button {
+            flex: 0.8;
+            font-size: 0.75rem;
+            padding: 0.6rem;
+        }
+
         .notice {
             text-align: center;
             font-size: 0.9rem;
@@ -403,41 +359,12 @@
             text-shadow: 0 0 10px rgba(138, 0, 255, 0.5);
         }
 
-        .notice span {
-            display: inline-block;
-            animation: slideRightToLeft 20s linear infinite;
-        }
+        .notice span { display: inline-block; animation: slideRightToLeft 20s linear infinite; }
+        .notice::before { left: 0; background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent); }
+        .notice::after { right: 0; background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent); }
+        @keyframes slideRightToLeft { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        .notice::before,
-        .notice::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 25%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .notice::before {
-            left: 0;
-            background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent);
-        }
-
-        .notice::after {
-            right: 0;
-            background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent);
-        }
-
-        @keyframes slideRightToLeft {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Admin Panel Styles */
-        .admin-page .user-list, .admin-page .withdraw-list {
-            margin-top: 1rem;
-        }
-
+        .admin-page .user-list, .admin-page .withdraw-list { margin-top: 1rem; }
         .admin-page .user-item, .admin-page .withdraw-item {
             background: rgba(255, 251, 255, 0.05);
             padding: 1rem;
@@ -446,109 +373,48 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .admin-page .user-item p, .admin-page .withdraw-item p {
-            margin: 0.5rem 0;
-        }
-
+        .admin-page .user-item p, .admin-page .withdraw-item p { margin: 0.5rem 0; }
         .admin-page .user-item button, .admin-page .withdraw-item button {
             margin: 0.3rem 0.5rem 0 0;
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
         }
 
-        /* Responsive Design */
         @media (max-width: 600px) {
-            .splash h1 {
-                font-size: 6vw;
-            }
-
-            .splash p {
-                font-size: 0.8rem;
-            }
-
-            h2 {
-                font-size: 1.4rem;
-            }
-
-            .balance-page p {
-                font-size: 1.8rem;
-            }
-
-            .balance-page p:nth-child(3),
-            .invite-page p,
-            .withdraw-page p,
-            .about-page p,
-            .admin-page p {
-                font-size: 0.9rem;
-            }
-
-            button {
-                font-size: 0.9rem;
-                padding: 0.7rem 1.3rem;
-            }
-
-            .invite-page .action-button,
-            .withdraw-page .action-button {
-                font-size: 1.1rem;
-                padding: 0.9rem 1.8rem;
-            }
-
-            select, input {
-                font-size: 0.9rem;
-            }
-
-            .nav button {
-                font-size: 0.8rem;
-                padding: 0.8rem;
-            }
-
-            .popup p {
-                font-size: 0.9rem;
-            }
-
-            .notice {
-                font-size: 0.8rem;
-            }
-
-            .admin-page .user-item button, .admin-page .withdraw-item button {
-                font-size: 0.8rem;
-                padding: 0.5rem 0.8rem;
-            }
+            .splash h1 { font-size: 6vw; }
+            .splash p { font-size: 0.8rem; }
+            h2 { font-size: 1.4rem; }
+            .balance-page p { font-size: 1.8rem; }
+            .balance-page p:nth-child(3), .invite-page p, .withdraw-page p, .about-page p, .admin-page p { font-size: 0.9rem; }
+            button { font-size: 0.9rem; padding: 0.7rem 1.3rem; }
+            .invite-page .action-button, .withdraw-page .action-button { font-size: 1.1rem; padding: 0.9rem 1.8rem; }
+            select, input { font-size: 0.9rem; }
+            .nav button { font-size: 0.8rem; padding: 0.6rem; }
+            .nav.admin-active button { font-size: 0.7rem; padding: 0.5rem; }
+            .popup p { font-size: 0.9rem; }
+            .notice { font-size: 0.8rem; }
+            .admin-page .user-item button, .admin-page .withdraw-item button { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
         }
 
         @media (max-width: 400px) {
-            .nav {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .nav button {
-                margin: 0.5rem 0;
-                width: 90%;
-            }
-
-            .app {
-                padding: 1rem;
-                margin-bottom: 10rem;
-            }
+            .nav { flex-direction: column; align-items: center; }
+            .nav button { margin: 0.5rem 0; width: 90%; }
+            .app { padding: 1rem; margin-bottom: 10rem; }
         }
     </style>
 </head>
 <body>
     <canvas id="particles"></canvas>
-
     <div class="splash" id="splash">
         <h1>LBBD COMMUNITY</h1>
         <p>@Developed by LBBD COMMUNITY</p>
     </div>
-
     <div class="app" id="app">
         <div class="page balance-page" id="balance">
             <h2>Your Balance</h2>
             <p id="balance-amount">0 Coins</p>
             <p>Current coin value: To be announced soon!</p>
         </div>
-
         <div class="page invite-page" id="invite">
             <h2>Invite Friends</h2>
             <p>Share your unique referral link and earn 1 coin per friend who joins!</p>
@@ -557,7 +423,6 @@
             <p id="invite-status"></p>
             <button class="action-button" onclick="shareTelegram()">Share Telegram Community</button>
         </div>
-
         <div class="page withdraw-page" id="withdraw">
             <h2>Withdraw Coins</h2>
             <p>Minimum withdrawal amount: To be announced soon!</p>
@@ -572,7 +437,6 @@
             <p id="withdraw-status"></p>
             <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
         </div>
-
         <div class="page about-page" id="about">
             <h2>About LBBD Community</h2>
             <p>
@@ -585,20 +449,14 @@
                 <span>Like Hamster Kombat and other Tap-2-Earn projects, LBBD COMMUNITY is launching Tap-2-Earn bots in Bangladesh. This referral web app is just our first step — support us and more will come!</span>
             </div>
         </div>
-
         <div class="page admin-page" id="admin">
             <h2>Admin Panel</h2>
             <p id="admin-access-message"></p>
-            <div class="user-list" id="user-list">
-                <!-- User list will be populated here -->
-            </div>
+            <div class="user-list" id="user-list"></div>
             <h2>Withdraw Requests</h2>
-            <div class="withdraw-list" id="withdraw-list">
-                <!-- Withdraw requests will be populated here -->
-            </div>
+            <div class="withdraw-list" id="withdraw-list"></div>
         </div>
     </div>
-
     <div class="nav" id="nav">
         <button id="nav-balance">Balance</button>
         <button id="nav-invite">Invite Friends</button>
@@ -606,14 +464,11 @@
         <button id="nav-about">About</button>
         <button id="nav-admin" style="display: none;">Admin</button>
     </div>
-
     <div class="popup" id="popup" style="display: none;">
         <p id="popup-message"></p>
         <button onclick="closePopup()">OK</button>
     </div>
-
     <script>
-        // Initialize Firebase with your config
         try {
             const firebaseConfig = {
                 apiKey: "AIzaSyDdYyNNk7FxUptu40Riumr2ZcftMglPMVk",
@@ -631,7 +486,6 @@
             showPopup('Error initializing Firebase. Check console for details.');
         }
 
-        // Enhanced Particle Animation
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -668,7 +522,6 @@
         }
         animateParticles();
 
-        // Restrict Amount Input to Numbers
         function restrictToNumbers(event) {
             const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Enter', 'ArrowLeft', 'ArrowRight', 'Delete'];
             if (!allowedKeys.includes(event.key)) {
@@ -679,46 +532,47 @@
             }
         }
 
-        // App Logic
         let balance = 0;
         let friendsInvited = 0;
         let currentUser = null;
         const telegramChannel = 'https://t.me/LBBD_MINING_OFFICIAL';
-        const baseReferralUrl = 'https://lbbd-community.com/refer?code=';
-
-        // Admin Telegram ID
+        const baseReferralUrl = 'https://lbbduser.github.io/lbbd-mini-app/?ref=';
         const adminTelegramId = '6672573765';
 
-        // Improved Telegram Web App initialization
         function initTelegram() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                const Telegram = window.Telegram.WebApp;
-                Telegram.ready();
+            // Check if we're in the Telegram environment
+            const isTelegram = window.Telegram && window.Telegram.WebApp;
+            if (!isTelegram) {
+                showPopup('Please use this app within Telegram.');
+                return;
+            }
+
+            const Telegram = window.Telegram.WebApp;
+            Telegram.ready();
+
+            let attempts = 0;
+            const maxAttempts = 10;
+            const checkInterval = setInterval(() => {
                 currentUser = Telegram.initDataUnsafe.user;
                 if (currentUser && currentUser.id) {
                     showPopup(`Your Telegram ID: ${currentUser.id}`);
                     if (currentUser.id.toString() === adminTelegramId) {
+                        document.getElementById('nav').classList.add('admin-active');
                         document.getElementById('nav-admin').style.display = 'block';
                     }
-                } else {
-                    showPopup('Unable to detect Telegram user ID. Please try again.');
+                    clearInterval(checkInterval);
+                } else if (attempts >= maxAttempts) {
+                    showPopup('Unable to detect Telegram user ID after multiple attempts. Please reload the app.');
+                    clearInterval(checkInterval);
                 }
-            } else {
-                showPopup('Telegram WebApp not available. Please use within Telegram.');
-            }
-            setTimeout(checkAdmin, 1000); // Fallback check
+                attempts++;
+            }, 500);
+
+            // Additional safety: Force Telegram API to re-initialize
+            Telegram.expand();
+            Telegram.enableClosingConfirmation();
         }
 
-        function checkAdmin() {
-            if (!currentUser && window.Telegram && window.Telegram.WebApp) {
-                currentUser = window.Telegram.WebApp.initDataUnsafe.user;
-                if (currentUser && currentUser.id && currentUser.id.toString() === adminTelegramId) {
-                    document.getElementById('nav-admin').style.display = 'block';
-                }
-            }
-        }
-
-        // Generate unique referral code
         function generateReferralCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let code = '';
@@ -728,7 +582,6 @@
             return code;
         }
 
-        // Initialize user in Firestore
         async function initializeUser() {
             if (!currentUser || !db) return;
             const userRef = db.collection('users').doc(currentUser.id.toString());
@@ -753,29 +606,31 @@
             document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
         }
 
-        // Simulate friend joining
-        async function friendJoined() {
-            if (!currentUser || !db) return;
-            friendsInvited++;
-            balance++;
-            const userRef = db.collection('users').doc(currentUser.id.toString());
-            await userRef.update({
-                coins: balance,
-                invitedUsers: firebase.firestore.FieldValue.arrayUnion('NewFriend')
-            });
-            document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-            document.getElementById('balance-amount').textContent = `${balance} Coins`;
-            document.getElementById('invite-status').textContent = `Friend joined! You earned 1 coin.`;
-            showPopup('A friend joined using your link! You earned 1 coin.');
+        async function friendJoined(referrerId) {
+            if (!db) return;
+            const referrerRef = db.collection('users').doc(referrerId.toString());
+            const referrerDoc = await referrerRef.get();
+            if (referrerDoc.exists) {
+                const referrerData = referrerDoc.data();
+                const updatedInvited = [...new Set([...referrerData.invitedUsers, currentUser.id])];
+                await referrerRef.update({
+                    coins: referrerData.coins + 1,
+                    invitedUsers: updatedInvited
+                });
+                balance = referrerData.coins + 1;
+                friendsInvited = updatedInvited.length;
+                document.getElementById('balance-amount').textContent = `${balance} Coins`;
+                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                document.getElementById('invite-status').textContent = `You joined via a referral! Referrer earned 1 coin.`;
+                showPopup('Welcome! Your referrer earned 1 coin.');
+            }
         }
 
-        // Page navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
         }
 
-        // Add event listeners for navigation buttons
         document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
         document.getElementById('nav-invite').addEventListener('click', () => showPage('invite'));
         document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
@@ -789,7 +644,6 @@
             }
         });
 
-        // Show popup
         function showPopup(message) {
             const popup = document.getElementById('popup');
             const popupMessage = document.getElementById('popup-message');
@@ -800,7 +654,6 @@
             }, 10);
         }
 
-        // Close popup
         function closePopup() {
             const popup = document.getElementById('popup');
             popup.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -809,22 +662,14 @@
             }, 500);
         }
 
-        // Share Telegram link
         function shareTelegram() {
-            const shareText = `Join LBBD COMMUNITY and earn rewards! Use my referral link: ${referralLink}`;
-            const shareUrl = `tg://msg?text=${encodeURIComponent(shareText)}`;
+            const referralLink = document.getElementById('referral-link').textContent.replace('Your referral link: ', '');
+            const shareText = `Join LBBD COMMUNITY and earn rewards! Join our Telegram: ${telegramChannel} Use my referral link: ${referralLink}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(telegramChannel)}&text=${encodeURIComponent(shareText)}`;
             window.open(shareUrl, '_blank');
-
-            setTimeout(() => {
-                if (!document.hasFocus()) return;
-                const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
-                window.open(fallbackUrl, '_blank');
-            }, 500);
-
             document.getElementById('invite-status').textContent = 'Invite sent! Waiting for friend to join...';
         }
 
-        // Payment method selection
         const methodSelect = document.getElementById('method');
         const detailsInput = document.getElementById('details');
         methodSelect.addEventListener('change', () => {
@@ -840,7 +685,6 @@
             }
         });
 
-        // Handle withdrawal
         async function withdraw() {
             if (!currentUser || !db) return;
             if (balance === 0) {
@@ -891,7 +735,6 @@
             document.getElementById('details').value = `${method}: `;
         }
 
-        // Admin Panel Logic
         async function loadAdminPanel() {
             if (!currentUser || !db || currentUser.id.toString() !== adminTelegramId) {
                 document.getElementById('admin-access-message').textContent = 'Access denied: Admin only.';
@@ -946,9 +789,7 @@
         async function adjustCoins(userId, amount) {
             if (!db) return;
             const userRef = db.collection('users').doc(userId);
-            await userRef.update({
-                coins: firebase.firestore.FieldValue.increment(amount)
-            });
+            await userRef.update({ coins: firebase.firestore.FieldValue.increment(amount) });
             loadAdminPanel();
             showPopup(`Adjusted coins by ${amount} for user ${userId}`);
         }
@@ -957,9 +798,7 @@
             if (!db) return;
             const newCode = generateReferralCode();
             const userRef = db.collection('users').doc(userId);
-            await userRef.update({
-                referralLink: `${baseReferralUrl}${newCode}`
-            });
+            await userRef.update({ referralLink: `${baseReferralUrl}${newCode}` });
             loadAdminPanel();
             showPopup(`Reset referral link for user ${userId}`);
         }
@@ -967,9 +806,7 @@
         async function toggleBan(userId, isBanned) {
             if (!db) return;
             const userRef = db.collection('users').doc(userId);
-            await userRef.update({
-                isBanned: !isBanned
-            });
+            await userRef.update({ isBanned: !isBanned });
             loadAdminPanel();
             showPopup(`User ${userId} ${isBanned ? 'unbanned' : 'banned'}`);
         }
@@ -989,15 +826,18 @@
             showPopup(`Withdrawal request marked as ${status}`);
         }
 
-        // Remove splash screen and initialize
         setTimeout(() => {
             document.getElementById('splash').remove();
             showPage('balance');
             initializeUser();
             initTelegram();
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref && currentUser && currentUser.id) {
+                friendJoined(ref.split('=')[1]);
+            }
         }, 4000);
 
-        // Resize canvas on window resize
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
