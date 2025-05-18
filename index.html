@@ -14,20 +14,26 @@
             font-family: 'Segoe UI', Arial, sans-serif;
         }
 
+        html {
+            height: 100%;
+        }
+
         body {
             background: linear-gradient(135deg, #0a0a25, #250a45);
             color: #fff;
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
+            margin: 0;
+            padding: 0;
         }
 
         canvas#particles {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: -1;
             opacity: 0.5;
         }
@@ -48,7 +54,7 @@
         }
 
         .splash h1 {
-            font-size: 8vw;
+            font-size: clamp(2rem, 8vw, 8rem);
             text-transform: uppercase;
             letter-spacing: 0.7rem;
             background: linear-gradient(45deg, #fff, #ffd700);
@@ -62,7 +68,7 @@
         .splash p {
             position: absolute;
             bottom: 2rem;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1vw, 1rem);
             color: #ffd700;
             opacity: 0.9;
             animation: slideUp 1s ease-in-out;
@@ -100,14 +106,14 @@
         @keyframes slideIn { from { transform: translateY(80px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
         h2 {
-            font-size: 1.7rem;
+            font-size: clamp(1.4rem, 2.5vw, 1.7rem);
             margin-bottom: 1.3rem;
             color: #ffd700;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         .balance-page p {
-            font-size: 2.3rem;
+            font-size: clamp(1.8rem, 3vw, 2.3rem);
             font-weight: bold;
             background: linear-gradient(45deg, #ffd700, #fff);
             -webkit-background-clip: text;
@@ -121,7 +127,7 @@
         .withdraw-page p,
         .about-page p,
         .admin-page p {
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
             color: #e6e6ff;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -140,9 +146,9 @@
         button {
             background: linear-gradient(45deg, #8a00ff, #c200ff);
             border: none;
-            padding: 0.8rem 1.8rem;
+            padding: clamp(0.6rem, 1vw, 0.8rem) clamp(1.3rem, 2vw, 1.8rem);
             color: #fff;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
             border-radius: 30px;
             cursor: pointer;
             position: relative;
@@ -213,8 +219,8 @@
         .withdraw-page .action-button {
             display: block;
             margin: 2rem auto 0;
-            padding: 1.1rem 2.2rem;
-            font-size: 1.2rem;
+            padding: clamp(0.9rem, 1.5vw, 1.1rem) clamp(1.8rem, 2.5vw, 2.2rem);
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
             box-shadow: 0 10px 30px rgba(138, 0, 255, 0.6);
         }
 
@@ -225,26 +231,26 @@
 
         input {
             width: 100%;
-            padding: 0.9rem;
-            margin: 0.7rem 0;
+            padding: clamp(0.7rem, 1vw, 0.9rem);
+            margin: clamp(0.5rem, 0.8vw, 0.7rem) 0;
             border-radius: 15px;
             border: none;
             background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
             color: #e6e6ff;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(138, 0, 255, 0.3);
             transition: box-shadow 0.3s, transform 0.3s;
         }
 
         select {
             width: 100%;
-            padding: 0.9rem;
-            margin: 0.7rem 0;
+            padding: clamp(0.7rem, 1vw, 0.9rem);
+            margin: clamp(0.5rem, 0.8vw, 0.7rem) 0;
             border-radius: 15px;
             border: 1px solid rgba(138, 0, 255, 0.5);
             background: linear-gradient(45deg, rgba(40, 10, 80, 0.9), rgba(80, 20, 120, 0.7));
             color: #ffd700;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(138, 0, 255, 0.4);
             transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
             appearance: none;
@@ -270,7 +276,7 @@
         select option {
             background: #0a0a25;
             color: #fff;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
             padding: 0.5rem;
         }
 
@@ -286,7 +292,7 @@
             content: '';
             position: absolute;
             width: 2px;
-            height: 1.2rem;
+            height: clamp(1rem, 1.5vw, 1.2rem);
             background: #ffd700;
             animation: cursorGlow 1s infinite;
             right: 1rem;
@@ -295,27 +301,6 @@
         }
 
         @keyframes cursorGlow { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0, 0, 0, 0.95);
-            padding: 2rem;
-            border-radius: 30px;
-            text-align: center;
-            z-index: 2000;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            animation: popupShow 0.5s ease-in-out forwards;
-        }
-
-        .popup p { margin-bottom: 1.3rem; font-size: 1rem; color: #e6e6ff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-        .popup input { margin-bottom: 1rem; }
-        @keyframes popupShow { to { transform: translate(-50%, -50%) scale(1); } }
-        .popup button { padding: 0.7rem 1.3rem; }
 
         .nav {
             position: fixed;
@@ -327,16 +312,16 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(25px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.7rem;
+            padding: clamp(0.5rem, 1vw, 0.7rem);
             box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5);
             z-index: 100;
         }
 
         .nav button {
             flex: 1;
-            margin: 0 0.2rem;
-            padding: 0.8rem;
-            font-size: 0.85rem;
+            margin: 0 clamp(0.1rem, 0.3vw, 0.2rem);
+            padding: clamp(0.5rem, 1vw, 0.8rem);
+            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
             text-align: center;
             white-space: nowrap;
             display: flex;
@@ -347,13 +332,13 @@
 
         .nav.admin-active button {
             flex: 0.8;
-            font-size: 0.75rem;
-            padding: 0.6rem;
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            padding: clamp(0.4rem, 0.8vw, 0.6rem);
         }
 
         .notice {
             text-align: center;
-            font-size: 0.9rem;
+            font-size: clamp(0.7rem, 1vw, 0.9rem);
             color: #e6e6ff;
             opacity: 0.9;
             margin-top: 1.5rem;
@@ -363,47 +348,186 @@
             text-shadow: 0 0 10px rgba(138, 0, 255, 0.5);
         }
 
-        .notice span { display: inline-block; animation: slideRightToLeft 20s linear infinite; }
-        .notice::before { left: 0; background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent); }
-        .notice::after { right: 0; background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent); }
+        .notice::before,
+        .notice::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .notice::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(10, 10, 37, 1), transparent);
+        }
+
+        .notice::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(10, 10, 37, 1), transparent);
+        }
+
+        .notice span {
+            display: inline-block;
+            animation: slideRightToLeft 20s linear infinite;
+        }
+
         @keyframes slideRightToLeft { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        .admin-page .user-list, .admin-page .withdraw-list { margin-top: 1rem; }
-        .admin-page .user-item, .admin-page .withdraw-item {
-            background: rgba(255, 251, 255, 0.05);
+        /* Admin Panel Specific Styles */
+        .admin-page {
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-page::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .admin-page::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-page::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 4px;
+        }
+
+        .admin-section {
+            margin-bottom: 2rem;
             padding: 1rem;
-            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .admin-page .user-item p, .admin-page .withdraw-item p { margin: 0.5rem 0; }
-        .admin-page .user-item button, .admin-page .withdraw-item button {
-            margin: 0.3rem 0.5rem 0 0;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
+        .admin-section h3 {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .admin-section .user-list,
+        .admin-section .withdraw-list {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-section .user-list::-webkit-scrollbar,
+        .admin-section .withdraw-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .admin-section .user-list::-webkit-scrollbar-track,
+        .admin-section .withdraw-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-section .user-list::-webkit-scrollbar-thumb,
+        .admin-section .withdraw-list::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 3px;
+        }
+
+        .admin-section .user-item,
+        .admin-section .withdraw-item {
+            background: rgba(255, 251, 255, 0.05);
+            padding: clamp(0.8rem, 1.5vw, 1rem);
+            margin-bottom: clamp(0.8rem, 1.5vw, 1rem);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .admin-section .user-item select,
+        .admin-section .withdraw-item select {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .admin-section .user-item p,
+        .admin-section .withdraw-item p {
+            margin: clamp(0.4rem, 0.7vw, 0.5rem) 0;
+        }
+
+        .admin-section .user-item button,
+        .admin-section .withdraw-item button {
+            margin: clamp(0.2rem, 0.4vw, 0.3rem) clamp(0.4rem, 0.7vw, 0.5rem) 0 0;
+            padding: clamp(0.4rem, 0.7vw, 0.5rem) clamp(0.8rem, 1.5vw, 1rem);
+            font-size: clamp(0.7rem, 1vw, 0.9rem);
+        }
+
+        .admin-section .notice-form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .admin-section .notice-form input {
+            width: 70%;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            animation: popupFadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes popupFadeIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .popup h3 {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .popup input {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .popup .error-message {
+            color: #ff4d4d;
+            font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+            margin-top: 0.5rem;
+            display: none;
         }
 
         @media (max-width: 600px) {
-            .splash h1 { font-size: 6vw; }
-            .splash p { font-size: 0.8rem; }
-            h2 { font-size: 1.4rem; }
-            .balance-page p { font-size: 1.8rem; }
-            .balance-page p:nth-child(3), .invite-page p, .withdraw-page p, .about-page p, .admin-page p { font-size: 0.9rem; }
-            button { font-size: 0.9rem; padding: 0.7rem 1.3rem; }
-            .invite-page .action-button, .withdraw-page .action-button { font-size: 1.1rem; padding: 0.9rem 1.8rem; }
-            select, input { font-size: 0.9rem; }
-            .nav button { font-size: 0.8rem; padding: 0.6rem; }
-            .nav.admin-active button { font-size: 0.7rem; padding: 0.5rem; }
-            .popup p { font-size: 0.9rem; }
-            .notice { font-size: 0.8rem; }
-            .admin-page .user-item button, .admin-page .withdraw-item button { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
-        }
-
-        @media (max-width: 400px) {
-            .nav { flex-direction: column; align-items: center; }
-            .nav button { margin: 0.5rem 0; width: 90%; }
-            .app { padding: 1rem; margin-bottom: 10rem; }
+            .nav { flex-direction: row; align-items: center; }
+            .nav button { margin: 0 clamp(0.1rem, 0.3vw, 0.2rem); width: auto; }
+            .app { padding: clamp(0.8rem, 1.5vw, 1rem); margin-bottom: clamp(8rem, 12vw, 10rem); }
+            .admin-section .notice-form { flex-direction: column; }
+            .admin-section .notice-form input { width: 100%; }
         }
     </style>
 </head>
@@ -420,12 +544,12 @@
             <p>Current coin value: To be announced soon!</p>
         </div>
         <div class="page invite-page" id="invite">
-            <h2>Invite Friends</h2>
-            <p>Share your unique referral link and earn 1 coin per friend who joins!</p>
+            <h2>Invite</h2>
+            <p>Share your unique referral link and earn 1 coin per friend who joins @earn_by_lbbd_bot!</p>
             <p id="referral-link">Generating your link...</p>
             <p id="friends-invited">Friends Invited: 0</p>
             <p id="invite-status"></p>
-            <button class="action-button" onclick="shareTelegram()">Share Telegram Community</button>
+            <button class="action-button" onclick="shareBot()">Share @earn_by_lbbd_bot</button>
         </div>
         <div class="page withdraw-page" id="withdraw">
             <h2>Withdraw Coins</h2>
@@ -448,31 +572,47 @@
                 Our mission is to empower users through innovative, rewarding, and engaging platforms.
                 This referral web app is just the beginning — join us to support our journey and unlock exciting Tap-2-Earn bots and more!
             </p>
-            <p>Join our Telegram: <a href="https://t.me/LBBD_MINING_OFFICIAL" target="_blank">t.me/LBBD_MINING_OFFICIAL</a></p>
+            <p>Join our bot: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
             <div class="notice">
-                <span>Like Hamster Kombat and other Tap-2-Earn projects, LBBD COMMUNITY is launching Tap-2-Earn bots in Bangladesh. This referral web app is just our first step — support us and more will come!</span>
+                <span>Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
             </div>
         </div>
         <div class="page admin-page" id="admin">
             <h2>Admin Panel</h2>
-            <p id="admin-access-message"></p>
-            <div class="user-list" id="user-list"></div>
-            <h2>Withdraw Requests</h2>
-            <div class="withdraw-list" id="withdraw-list"></div>
+            <p id="admin-access-message">Welcome, Admin!</p>
+            <div class="admin-section">
+                <h3>User Management</h3>
+                <div class="user-list" id="user-list"></div>
+            </div>
+            <div class="admin-section">
+                <h3>Withdrawal Requests</h3>
+                <div class="withdraw-list" id="withdraw-list"></div>
+            </div>
+            <div class="admin-section">
+                <h3>Send Notice to All Users</h3>
+                <div class="notice-form">
+                    <input type="text" id="admin-notice" placeholder="Enter notice message">
+                    <button onclick="sendNotice()">Send Notice</button>
+                </div>
+                <p id="notice-status"></p>
+            </div>
         </div>
     </div>
     <div class="nav" id="nav">
         <button id="nav-balance">Balance</button>
-        <button id="nav-invite">Invite Friends</button>
+        <button id="nav-invite">Invite</button>
         <button id="nav-withdraw">Withdraw</button>
         <button id="nav-about">About</button>
         <button id="nav-admin">Admin</button>
     </div>
-    <div class="popup" id="popup" style="display: none;">
-        <p id="popup-message"></p>
-        <input type="password" id="admin-password" placeholder="Enter admin password" style="display: none;">
-        <button id="popup-ok" onclick="closePopup()">OK</button>
-        <button id="admin-submit" onclick="checkAdminPassword()" style="display: none;">Submit</button>
+    <div class="popup-overlay" id="admin-popup">
+        <div class="popup">
+            <h3>Admin Access</h3>
+            <input type="password" id="admin-password" placeholder="Enter admin password">
+            <button onclick="checkAdminPassword()">Submit</button>
+            <button onclick="closePopup()">Cancel</button>
+            <p class="error-message" id="admin-error">Incorrect password. Please try again.</p>
+        </div>
     </div>
     <script>
         let db = null;
@@ -490,7 +630,6 @@
             console.log('Firebase initialized successfully');
         } catch (error) {
             console.error('Firebase initialization error:', error);
-            showPopup('Error initializing Firebase. Check console for details.');
         }
 
         const canvas = document.getElementById('particles');
@@ -543,7 +682,7 @@
         let friendsInvited = 0;
         let currentUser = null;
         let referrerId = null;
-        const telegramChannel = 'https://t.me/LBBD_MINING_OFFICIAL';
+        const botLink = 'https://t.me/earn_by_lbbd_bot';
         const baseReferralUrl = 'https://lbbduser.github.io/lbbd-mini-app/?ref=';
         const adminPassword = 'hussainriyalbbd';
         let isAdminAuthenticated = false;
@@ -551,7 +690,7 @@
         function initTelegram() {
             const isTelegram = window.Telegram && window.Telegram.WebApp;
             if (!isTelegram) {
-                showPopup('Please use this app within Telegram.');
+                document.getElementById('admin-access-message').textContent = 'Please use this app within Telegram.';
                 return false;
             }
 
@@ -565,12 +704,12 @@
             const checkInterval = setInterval(() => {
                 currentUser = Telegram.initDataUnsafe.user;
                 if (currentUser && currentUser.id) {
-                    showPopup(`Welcome! Your Telegram ID: ${currentUser.id}`);
+                    document.getElementById('admin-access-message').textContent = `Welcome! Your Telegram ID: ${currentUser.id}`;
                     clearInterval(checkInterval);
                     initializeUser();
                     checkReferral();
                 } else if (attempts >= maxAttempts) {
-                    showPopup('Unable to detect Telegram user ID after multiple attempts. Please reload the app.');
+                    document.getElementById('admin-access-message').textContent = 'Unable to detect Telegram user ID after multiple attempts. Please reload the app.';
                     clearInterval(checkInterval);
                 }
                 attempts++;
@@ -584,7 +723,7 @@
 
         async function initializeUser() {
             if (!currentUser || !db) {
-                showPopup('Database not initialized. Please try again later.');
+                document.getElementById('admin-access-message').textContent = 'Database not initialized. Please try again later.';
                 return;
             }
             const userRef = db.collection('users').doc(currentUser.id.toString());
@@ -599,6 +738,7 @@
                     invitedUsers: [],
                     isBanned: false,
                     withdrawalHistory: [],
+                    notices: [],
                     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
@@ -618,7 +758,7 @@
                     const decodedRef = atob(ref.padEnd((ref.length + 3) & ~3, '='));
                     if (decodedRef !== currentUser.id.toString()) {
                         referrerId = decodedRef;
-                        await friendJoined(decodedRef);
+                        await verifyBotJoin(decodedRef);
                     }
                 } catch (e) {
                     console.error('Error decoding referral:', e);
@@ -626,9 +766,9 @@
             }
         }
 
-        async function friendJoined(referrerId) {
+        async function verifyBotJoin(referrerId) {
             if (!db || !currentUser || !referrerId) {
-                showPopup('Database not initialized or user not found.');
+                document.getElementById('admin-access-message').textContent = 'Database or user not found.';
                 return;
             }
             const userRef = db.collection('users').doc(currentUser.id.toString());
@@ -649,30 +789,49 @@
                 return;
             }
 
-            const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
-            await referrerRef.update({
-                coins: (referrerData.coins || 0) + 1,
-                invitedUsers: updatedInvited
-            });
+            const botJoined = true; // Assume bot join is confirmed for now
+            if (botJoined) {
+                const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
+                await referrerRef.update({
+                    coins: (referrerData.coins || 0) + 1,
+                    invitedUsers: updatedInvited
+                });
 
-            await userRef.update({
-                invitedBy: referrerId
-            });
+                await userRef.update({
+                    invitedBy: referrerId
+                });
 
-            if (referrerId === currentUser.id.toString()) {
-                balance = (referrerData.coins || 0) + 1;
-                friendsInvited = updatedInvited.length;
-                document.getElementById('balance-amount').textContent = `${balance} Coins`;
-                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                if (referrerId === currentUser.id.toString()) {
+                    balance = (referrerData.coins || 0) + 1;
+                    friendsInvited = updatedInvited.length;
+                    document.getElementById('balance-amount').textContent = `${balance} Coins`;
+                    document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                }
+
+                document.getElementById('invite-status').textContent = `You joined @earn_by_lbbd_bot via a referral! Referrer earned 1 coin.`;
+            } else {
+                document.getElementById('invite-status').textContent = 'Please join @earn_by_lbbd_bot to complete the referral.';
             }
-
-            document.getElementById('invite-status').textContent = `You joined via a referral! Referrer earned 1 coin.`;
-            showPopup('Welcome! Your referrer earned 1 coin.');
         }
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            if (pageId === 'admin' && !isAdminAuthenticated) {
+                showAdminPopup();
+            }
+        }
+
+        function showAdminPopup() {
+            document.getElementById('admin-popup').style.display = 'flex';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('admin-error').style.display = 'none';
+            document.getElementById('admin-password').focus();
+        }
+
+        function closePopup() {
+            document.getElementById('admin-popup').style.display = 'none';
+            showPage('balance');
         }
 
         document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
@@ -682,75 +841,31 @@
         document.getElementById('nav-admin').addEventListener('click', () => {
             if (isAdminAuthenticated) {
                 showPage('admin');
-                loadAdminPanel();
             } else {
-                showAdminPasswordPrompt();
+                showAdminPopup();
             }
         });
-
-        function showAdminPasswordPrompt() {
-            const popup = document.getElementById('popup');
-            const popupMessage = document.getElementById('popup-message');
-            const adminPasswordInput = document.getElementById('admin-password');
-            const okButton = document.getElementById('popup-ok');
-            const submitButton = document.getElementById('admin-submit');
-
-            popupMessage.textContent = 'Enter Admin Password';
-            adminPasswordInput.style.display = 'block';
-            okButton.style.display = 'none';
-            submitButton.style.display = 'block';
-
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 10);
-        }
 
         function checkAdminPassword() {
             const passwordInput = document.getElementById('admin-password').value;
             if (passwordInput === adminPassword) {
                 isAdminAuthenticated = true;
-                closePopup();
+                document.getElementById('admin-popup').style.display = 'none';
+                document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
                 showPage('admin');
                 loadAdminPanel();
             } else {
-                showPopup('Incorrect password. Please try again.');
+                document.getElementById('admin-error').style.display = 'block';
+                document.getElementById('admin-password').value = '';
             }
         }
 
-        function showPopup(message) {
-            const popup = document.getElementById('popup');
-            const popupMessage = document.getElementById('popup-message');
-            const adminPasswordInput = document.getElementById('admin-password');
-            const okButton = document.getElementById('popup-ok');
-            const submitButton = document.getElementById('admin-submit');
-
-            popupMessage.textContent = message;
-            adminPasswordInput.style.display = 'none';
-            adminPasswordInput.value = '';
-            okButton.style.display = 'block';
-            submitButton.style.display = 'none';
-
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 10);
-        }
-
-        function closePopup() {
-            const popup = document.getElementById('popup');
-            popup.style.transform = 'translate(-50%, -50%) scale(0)';
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 500);
-        }
-
-        function shareTelegram() {
+        function shareBot() {
             const referralLink = document.getElementById('referral-link').textContent.replace('Your referral link: ', '');
-            const shareText = `Join LBBD COMMUNITY and earn rewards! Join our Telegram: ${telegramChannel} Use my referral link: ${referralLink}`;
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(telegramChannel)}&text=${encodeURIComponent(shareText)}`;
+            const shareText = `Join @earn_by_lbbd_bot and earn rewards! Use my referral link: ${referralLink}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`;
             window.open(shareUrl, '_blank');
-            document.getElementById('invite-status').textContent = 'Invite sent! Waiting for friend to join...';
+            document.getElementById('invite-status').textContent = 'Invite sent! Waiting for friend to join @earn_by_lbbd_bot...';
         }
 
         const methodSelect = document.getElementById('method');
@@ -770,11 +885,11 @@
 
         async function withdraw() {
             if (!currentUser || !db) {
-                showPopup('Database not initialized or user not found.');
+                document.getElementById('admin-access-message').textContent = 'Database not initialized or user not found.';
                 return;
             }
             if (balance === 0) {
-                showPopup('You have no coins to withdraw!');
+                document.getElementById('withdraw-status').textContent = 'You have no coins to withdraw!';
                 return;
             }
 
@@ -783,12 +898,12 @@
             const details = document.getElementById('details').value;
 
             if (!amount || !details || details === `${method}: `) {
-                showPopup('Please fill all fields.');
+                document.getElementById('withdraw-status').textContent = 'Please fill all fields.';
                 return;
             }
 
             if (amount > balance) {
-                showPopup('Insufficient balance.');
+                document.getElementById('withdraw-status').textContent = 'Insufficient balance.';
                 return;
             }
 
@@ -828,29 +943,40 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
+            // Load User Management Section
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
             const usersSnapshot = await db.collection('users').get();
-            usersSnapshot.forEach(doc => {
+            usersSnapshot.forEach(async doc => {
                 const user = doc.data();
+                const invitedUsernames = [];
+                for (const id of user.invitedUsers || []) {
+                    const invitedUserDoc = await db.collection('users').doc(id.toString()).get();
+                    const invitedUserData = invitedUserDoc.data();
+                    invitedUsernames.push(invitedUserData ? invitedUserData.username || 'Unknown' : 'Unknown');
+                }
                 const userItem = document.createElement('div');
                 userItem.className = 'user-item';
                 userItem.innerHTML = `
-                    <p>Telegram ID: ${user.telegramId}</p>
-                    <p>Username: ${user.username}</p>
-                    <p>Coins: ${user.coins}</p>
-                    <p>Referral Link: ${user.referralLink}</p>
-                    <p>Invited Users: ${user.invitedUsers ? user.invitedUsers.join(', ') : 'None'}</p>
+                    <p>Telegram Username: ${user.username || 'Anonymous'}</p>
+                    <p>Coins: <span id="coin-${doc.id}">${user.coins}</span></p>
+                    <p>Referred Friends: ${invitedUsernames.join(', ') || 'None'}</p>
+                    <p>Total Referrals: ${user.invitedUsers.length}</p>
                     <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
                     <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') : 'None'}</p>
-                    <button onclick="adjustCoins('${doc.id}', 10)">+10 Coins</button>
-                    <button onclick="adjustCoins('${doc.id}', -10)">-10 Coins</button>
-                    <button onclick="resetReferralLink('${doc.id}')">Reset Referral Link</button>
-                    <button onclick="toggleBan('${doc.id}', ${user.isBanned})">${user.isBanned ? 'Unban' : 'Ban'}</button>
+                    <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}')">
+                        <option value="">Select Action</option>
+                        <option value="ban">Ban User</option>
+                        <option value="unban">Unban User</option>
+                        <option value="add10">Add 10 Coins</option>
+                        <option value="subtract10">Subtract 10 Coins</option>
+                    </select>
                 `;
                 userList.appendChild(userItem);
+                updateLiveCoins(doc.id, user.coins);
             });
 
+            // Load Withdrawal Requests Section
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
             const withdrawSnapshot = await db.collection('withdraw_requests').get();
@@ -865,52 +991,52 @@
                     <p>Details: ${request.details}</p>
                     <p>Status: ${request.status}</p>
                     <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                    <button onclick="updateWithdrawStatus('${doc.id}', 'Paid')">Mark as Paid</button>
-                    <button onclick="updateWithdrawStatus('${doc.id}', 'Cancelled')">Mark as Cancelled</button>
+                    <select id="withdraw-select-${doc.id}" onchange="updateWithdrawStatus('${doc.id}', this.value)">
+                        <option value="">Select Action</option>
+                        <option value="Paid">Mark as Paid</option>
+                        <option value="Cancelled">Mark as Cancelled</option>
+                    </select>
                 `;
                 withdrawList.appendChild(withdrawItem);
             });
         }
 
-        async function adjustCoins(userId, amount) {
-            if (!db) {
-                showPopup('Database not initialized.');
-                return;
+        let selectedUserId = null;
+
+        function updateSelectedUser(userId) {
+            selectedUserId = userId;
+            const select = document.getElementById(`user-select-${userId}`);
+            const action = select.value;
+            if (action) {
+                handleUserAction(action);
+                select.value = ""; // Reset dropdown
             }
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({ coins: firebase.firestore.FieldValue.increment(amount) });
-            loadAdminPanel();
-            showPopup(`Adjusted coins by ${amount} for user ${userId}`);
         }
 
-        async function resetReferralLink(userId) {
-            if (!db) {
-                showPopup('Database not initialized.');
-                return;
-            }
-            const newCode = generateReferralCode(userId);
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({ referralLink: `${baseReferralUrl}${newCode}` });
-            loadAdminPanel();
-            showPopup(`Reset referral link for user ${userId}`);
-        }
+        async function handleUserAction(action) {
+            if (!db || !selectedUserId) return;
 
-        async function toggleBan(userId, isBanned) {
-            if (!db) {
-                showPopup('Database not initialized.');
-                return;
+            const userRef = db.collection('users').doc(selectedUserId);
+            switch (action) {
+                case 'ban':
+                    await userRef.update({ isBanned: true });
+                    break;
+                case 'unban':
+                    await userRef.update({ isBanned: false });
+                    break;
+                case 'add10':
+                    await userRef.update({ coins: firebase.firestore.FieldValue.increment(10) });
+                    break;
+                case 'subtract10':
+                    await userRef.update({ coins: firebase.firestore.FieldValue.increment(-10) });
+                    break;
             }
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({ isBanned: !isBanned });
-            loadAdminPanel();
-            showPopup(`User ${userId} ${isBanned ? 'unbanned' : 'banned'}`);
+            loadAdminPanel(); // Refresh the panel
         }
 
         async function updateWithdrawStatus(requestId, status) {
-            if (!db) {
-                showPopup('Database not initialized.');
-                return;
-            }
+            if (!db) return;
+
             const requestRef = db.collection('withdraw_requests').doc(requestId);
             const request = (await requestRef.get()).data();
             await requestRef.update({ status });
@@ -920,8 +1046,43 @@
                 w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status } : w
             );
             await userRef.update({ withdrawalHistory: updatedHistory });
-            loadAdminPanel();
-            showPopup(`Withdrawal request marked as ${status}`);
+            loadAdminPanel(); // Refresh the panel
+        }
+
+        async function sendNotice() {
+            if (!db) {
+                document.getElementById('admin-access-message').textContent = 'Database not initialized.';
+                return;
+            }
+            const notice = document.getElementById('admin-notice').value;
+            if (notice) {
+                const usersSnapshot = await db.collection('users').get();
+                usersSnapshot.forEach(doc => {
+                    db.collection('users').doc(doc.id).update({
+                        notices: firebase.firestore.FieldValue.arrayUnion({
+                            message: notice,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                    });
+                });
+                document.getElementById('admin-notice').value = '';
+                document.getElementById('notice-status').textContent = 'Notice sent to all users!';
+            } else {
+                document.getElementById('notice-status').textContent = 'Please enter a notice message.';
+            }
+        }
+
+        function updateLiveCoins(userId, initialCoins) {
+            const coinElement = document.getElementById(`coin-${userId}`);
+            if (!coinElement) return;
+            let coins = initialCoins;
+            setInterval(async () => {
+                if (db) {
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    coins = userDoc.data().coins || coins;
+                    coinElement.textContent = coins;
+                }
+            }, 5000);
         }
 
         setTimeout(() => {
