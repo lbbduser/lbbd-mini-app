@@ -722,6 +722,14 @@
             <button onclick="cancelAction()">Cancel</button>
         </div>
     </div>
+    <div class="popup-overlay" id="delete-confirm-popup">
+        <div class="popup">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
+            <button onclick="confirmDelete(true)">OK</button>
+            <button onclick="confirmDelete(false)">Cancel</button>
+        </div>
+    </div>
     <script>
         let db = null;
         try {
@@ -1223,6 +1231,7 @@
                             <option value="unban">Unban User</option>
                             <option value="addCoins">Add Coins</option>
                             <option value="subtractCoins">Subtract Coins</option>
+                            <option value="delete">Delete User</option>
                         </select>
                     `;
                     userList.appendChild(userItem);
@@ -1277,8 +1286,53 @@
             } else if (action === 'subtractCoins') {
                 document.getElementById('subtract-coins-input').value = '';
                 document.getElementById('subtract-coins-popup').style.display = 'flex';
+            } else if (action === 'delete') {
+                document.getElementById('delete-confirm-popup').style.display = 'flex';
             }
             select.value = '';
+        }
+
+        async function confirmDelete(confirmed) {
+            document.getElementById('delete-confirm-popup').style.display = 'none';
+            if (confirmed) {
+                await deleteUser(selectedUserId);
+            }
+            selectedUserId = null;
+            selectedAction = null;
+        }
+
+        async function deleteUser(userId) {
+            if (!db || !userId) return;
+
+            // Delete the user from the users collection
+            const userRef = db.collection('users').doc(userId);
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+
+            // Remove the user from any referrer's invitedUsers list
+            if (userData.invitedBy) {
+                const referrerRef = db.collection('users').doc(userData.invitedBy);
+                const referrerDoc = await referrerRef.get();
+                if (referrerDoc.exists) {
+                    const referrerData = referrerDoc.data();
+                    const updatedInvitedUsers = (referrerData.invitedUsers || []).filter(id => id !== userId);
+                    await referrerRef.update({ invitedUsers: updatedInvitedUsers });
+                }
+            }
+
+            // Delete any withdrawal requests associated with the user
+            const withdrawRequests = await db.collection('withdraw_requests')
+                .where('telegramId', '==', userData.telegramId)
+                .get();
+            const batch = db.batch();
+            withdrawRequests.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+
+            // Delete the user document
+            await userRef.delete();
+            document.getElementById('admin-access-message').textContent = `User ${userData.username || 'Unknown'} deleted successfully!`;
         }
 
         function confirmBan(confirmed) {
