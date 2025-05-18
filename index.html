@@ -739,6 +739,8 @@
                     isBanned: false,
                     withdrawalHistory: [],
                     notices: [],
+                    hasJoinedBot: false,
+                    referralEvents: [],
                     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
@@ -748,6 +750,9 @@
             document.getElementById('balance-amount').textContent = `${balance} Coins`;
             document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
             document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+
+            // Mark user as having joined the bot
+            await userRef.update({ hasJoinedBot: true });
         }
 
         async function checkReferral() {
@@ -762,6 +767,7 @@
                     }
                 } catch (e) {
                     console.error('Error decoding referral:', e);
+                    document.getElementById('invite-status').textContent = 'Invalid referral link.';
                 }
             }
         }
@@ -778,6 +784,7 @@
 
             if (!referrerDoc.exists) {
                 console.log('Referrer not found');
+                document.getElementById('invite-status').textContent = 'Referrer not found.';
                 return;
             }
 
@@ -786,32 +793,52 @@
 
             if (userData.invitedBy) {
                 console.log('User already has a referrer');
+                document.getElementById('invite-status').textContent = 'You have already been referred.';
                 return;
             }
 
-            const botJoined = true; // Assume bot join is confirmed for now
-            if (botJoined) {
-                const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
-                await referrerRef.update({
-                    coins: (referrerData.coins || 0) + 1,
-                    invitedUsers: updatedInvited
-                });
-
-                await userRef.update({
-                    invitedBy: referrerId
-                });
-
-                if (referrerId === currentUser.id.toString()) {
-                    balance = (referrerData.coins || 0) + 1;
-                    friendsInvited = updatedInvited.length;
-                    document.getElementById('balance-amount').textContent = `${balance} Coins`;
-                    document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-                }
-
-                document.getElementById('invite-status').textContent = `You joined @earn_by_lbbd_bot via a referral! Referrer earned 1 coin.`;
-            } else {
+            // Check if the user has joined the bot
+            if (!userData.hasJoinedBot) {
                 document.getElementById('invite-status').textContent = 'Please join @earn_by_lbbd_bot to complete the referral.';
+                return;
             }
+
+            // Update referrer's data
+            const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
+            const referralEvent = {
+                referredUserId: currentUser.id,
+                referredUsername: currentUser.username || 'Anonymous',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                coinsAwarded: 1
+            };
+
+            await referrerRef.update({
+                coins: (referrerData.coins || 0) + 1,
+                invitedUsers: updatedInvited,
+                referralEvents: firebase.firestore.FieldValue.arrayUnion(referralEvent)
+            });
+
+            // Update the new user's data
+            await userRef.update({
+                invitedBy: referrerId
+            });
+
+            // Update UI for the referrer if they are the current user
+            if (referrerId === currentUser.id.toString()) {
+                balance = (referrerData.coins || 0) + 1;
+                friendsInvited = updatedInvited.length;
+                document.getElementById('balance-amount').textContent = `${balance} Coins`;
+                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+            }
+
+            // Notify both users
+            document.getElementById('invite-status').textContent = `You joined via ${referrerData.username || 'a friend'}'s referral! They earned 1 coin.`;
+            await referrerRef.update({
+                notices: firebase.firestore.FieldValue.arrayUnion({
+                    message: `Your friend ${currentUser.username || 'Anonymous'} joined via your referral link! You earned 1 coin.`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+            });
         }
 
         function showPage(pageId) {
@@ -943,61 +970,72 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
-            // Load User Management Section
+            // Load User Management Section with Real-Time Updates
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
-            const usersSnapshot = await db.collection('users').get();
-            usersSnapshot.forEach(async doc => {
-                const user = doc.data();
-                const invitedUsernames = [];
-                for (const id of user.invitedUsers || []) {
-                    const invitedUserDoc = await db.collection('users').doc(id.toString()).get();
-                    const invitedUserData = invitedUserDoc.data();
-                    invitedUsernames.push(invitedUserData ? invitedUserData.username || 'Unknown' : 'Unknown');
+            db.collection('users').onSnapshot(async (snapshot) => {
+                userList.innerHTML = '';
+                for (const doc of snapshot.docs) {
+                    const user = doc.data();
+                    const invitedUsernames = [];
+                    for (const id of user.invitedUsers || []) {
+                        const invitedUserDoc = await db.collection('users').doc(id.toString()).get();
+                        const invitedUserData = invitedUserDoc.data();
+                        invitedUsernames.push(invitedUserData ? invitedUserData.username || 'Unknown' : 'Unknown');
+                    }
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <p>Telegram Username: ${user.username || 'Anonymous'}</p>
+                        <p>Telegram ID: ${user.telegramId}</p>
+                        <p>Coins: <span id="coin-${doc.id}">${user.coins}</span></p>
+                        <p>Referred Friends: ${invitedUsernames.join(', ') || 'None'}</p>
+                        <p>Total Referrals: ${user.invitedUsers ? user.invitedUsers.length : 0}</p>
+                        <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
+                        <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') : 'None'}</p>
+                        <p>Referral Events: ${user.referralEvents ? user.referralEvents.map(e => `${e.referredUsername} joined and you earned ${e.coinsAwarded} coin(s)`).join(', ') : 'None'}</p>
+                        <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}')">
+                            <option value="">Select Action</option>
+                            <option value="ban">Ban User</option>
+                            <option value="unban">Unban User</option>
+                            <option value="add10">Add 10 Coins</option>
+                            <option value="subtract10">Subtract 10 Coins</option>
+                        </select>
+                    `;
+                    userList.appendChild(userItem);
+                    updateLiveCoins(doc.id, user.coins);
                 }
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                userItem.innerHTML = `
-                    <p>Telegram Username: ${user.username || 'Anonymous'}</p>
-                    <p>Coins: <span id="coin-${doc.id}">${user.coins}</span></p>
-                    <p>Referred Friends: ${invitedUsernames.join(', ') || 'None'}</p>
-                    <p>Total Referrals: ${user.invitedUsers.length}</p>
-                    <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
-                    <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') : 'None'}</p>
-                    <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}')">
-                        <option value="">Select Action</option>
-                        <option value="ban">Ban User</option>
-                        <option value="unban">Unban User</option>
-                        <option value="add10">Add 10 Coins</option>
-                        <option value="subtract10">Subtract 10 Coins</option>
-                    </select>
-                `;
-                userList.appendChild(userItem);
-                updateLiveCoins(doc.id, user.coins);
+            }, (error) => {
+                console.error('Error loading users:', error);
+                document.getElementById('admin-access-message').textContent = 'Error loading users. Please try again.';
             });
 
-            // Load Withdrawal Requests Section
+            // Load Withdrawal Requests Section with Real-Time Updates
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
-            const withdrawSnapshot = await db.collection('withdraw_requests').get();
-            withdrawSnapshot.forEach(doc => {
-                const request = doc.data();
-                const withdrawItem = document.createElement('div');
-                withdrawItem.className = 'withdraw-item';
-                withdrawItem.innerHTML = `
-                    <p>Username: ${request.username}</p>
-                    <p>Amount: ${request.amount} Coins</p>
-                    <p>Method: ${request.method}</p>
-                    <p>Details: ${request.details}</p>
-                    <p>Status: ${request.status}</p>
-                    <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                    <select id="withdraw-select-${doc.id}" onchange="updateWithdrawStatus('${doc.id}', this.value)">
-                        <option value="">Select Action</option>
-                        <option value="Paid">Mark as Paid</option>
-                        <option value="Cancelled">Mark as Cancelled</option>
-                    </select>
-                `;
-                withdrawList.appendChild(withdrawItem);
+            db.collection('withdraw_requests').onSnapshot((snapshot) => {
+                withdrawList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const request = doc.data();
+                    const withdrawItem = document.createElement('div');
+                    withdrawItem.className = 'withdraw-item';
+                    withdrawItem.innerHTML = `
+                        <p>Username: ${request.username}</p>
+                        <p>Amount: ${request.amount} Coins</p>
+                        <p>Method: ${request.method}</p>
+                        <p>Details: ${request.details}</p>
+                        <p>Status: ${request.status}</p>
+                        <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+                        <select id="withdraw-select-${doc.id}" onchange="updateWithdrawStatus('${doc.id}', this.value)">
+                            <option value="">Select Action</option>
+                            <option value="Paid">Mark as Paid</option>
+                            <option value="Cancelled">Mark as Cancelled</option>
+                        </select>
+                    `;
+                    withdrawList.appendChild(withdrawItem);
+                });
+            }, (error) => {
+                console.error('Error loading withdrawal requests:', error);
             });
         }
 
@@ -1031,7 +1069,6 @@
                     await userRef.update({ coins: firebase.firestore.FieldValue.increment(-10) });
                     break;
             }
-            loadAdminPanel(); // Refresh the panel
         }
 
         async function updateWithdrawStatus(requestId, status) {
@@ -1046,7 +1083,6 @@
                 w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status } : w
             );
             await userRef.update({ withdrawalHistory: updatedHistory });
-            loadAdminPanel(); // Refresh the panel
         }
 
         async function sendNotice() {
