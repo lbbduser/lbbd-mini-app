@@ -522,9 +522,14 @@
             margin-bottom: 1rem;
         }
 
-        .popup input {
+        .popup input, .popup textarea {
             width: 100%;
             margin-bottom: 1rem;
+        }
+
+        .popup textarea {
+            height: 100px;
+            resize: none;
         }
 
         .popup .error-message {
@@ -636,6 +641,87 @@
             <button onclick="closeNoticePopup()">Close</button>
         </div>
     </div>
+    <div class="popup-overlay" id="ban-confirm-popup">
+        <div class="popup">
+            <h3>Confirm Ban</h3>
+            <p>Are you sure you want to ban this user?</p>
+            <button onclick="confirmBan(true)">OK</button>
+            <button onclick="confirmBan(false)">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="ban-message-popup">
+        <div class="popup">
+            <h3>Ban Reason</h3>
+            <p>Type a message explaining why this user is being banned:</p>
+            <textarea id="ban-message-input" placeholder="Enter ban reason"></textarea>
+            <button onclick="submitBanMessage()">Submit</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="unban-confirm-popup">
+        <div class="popup">
+            <h3>Confirm Unban</h3>
+            <p>Are you sure you want to unban this user?</p>
+            <button onclick="confirmUnban(true)">OK</button>
+            <button onclick="confirmUnban(false)">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="unban-message-popup">
+        <div class="popup">
+            <h3>Unban Message</h3>
+            <p>Type a special message for this user:</p>
+            <textarea id="unban-message-input" placeholder="Enter unban message"></textarea>
+            <button onclick="submitUnbanMessage()">Submit</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="ban-notification-popup">
+        <div class="popup">
+            <h3>You Are Banned</h3>
+            <p id="ban-notification-message"></p>
+            <button onclick="closeBot()">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="unban-notification-popup">
+        <div class="popup">
+            <h3>Congratulations!</h3>
+            <p>You have been unbanned!</p>
+            <p id="unban-notification-message"></p>
+            <button onclick="closeUnbanNotification()">OK</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="add-coins-popup">
+        <div class="popup">
+            <h3>Add Coins</h3>
+            <p>Enter the amount of coins to add:</p>
+            <input type="number" id="add-coins-input" placeholder="Enter amount" min="1">
+            <button onclick="submitAddCoins()">Submit</button>
+            <button onclick="cancelAction()">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="subtract-coins-popup">
+        <div class="popup">
+            <h3>Subtract Coins</h3>
+            <p>Enter the amount of coins to subtract:</p>
+            <input type="number" id="subtract-coins-input" placeholder="Enter amount" min="1">
+            <button onclick="submitSubtractCoins()">Submit</button>
+            <button onclick="cancelAction()">Cancel</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="withdraw-status-popup">
+        <div class="popup">
+            <h3>Withdrawal Status</h3>
+            <p id="withdraw-status-message"></p>
+            <button onclick="closeWithdrawStatusPopup()">Close</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="cancel-reason-popup">
+        <div class="popup">
+            <h3>Cancellation Reason</h3>
+            <p>Type a message explaining why this withdrawal is being cancelled:</p>
+            <textarea id="cancel-reason-input" placeholder="Enter cancellation reason"></textarea>
+            <button onclick="submitCancelReason()">Submit</button>
+            <button onclick="cancelAction()">Cancel</button>
+        </div>
+    </div>
     <script>
         let db = null;
         try {
@@ -709,6 +795,9 @@
         const adminPassword = 'hussainriyalbbd';
         let isAdminAuthenticated = false;
         let testUserCounter = 0;
+        let selectedUserId = null;
+        let selectedAction = null;
+        let selectedWithdrawId = null;
 
         function initTelegram() {
             const isTelegram = window.Telegram && window.Telegram.WebApp;
@@ -734,6 +823,7 @@
                     clearInterval(checkInterval);
                     initializeUser();
                     checkReferral();
+                    checkBanStatus();
                 } else if (attempts >= maxAttempts) {
                     console.error('Failed to detect Telegram user after', maxAttempts, 'attempts.');
                     document.getElementById('admin-access-message').textContent = 'Unable to detect Telegram user ID after multiple attempts. Please reload the app.';
@@ -742,6 +832,31 @@
                 attempts++;
             }, 500);
             return true;
+        }
+
+        async function checkBanStatus() {
+            if (!currentUser || !db) return;
+            const userRef = db.collection('users').doc(currentUser.id.toString());
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            if (userData.isBanned) {
+                document.getElementById('ban-notification-message').textContent = `You have been banned. Reason: ${userData.banMessage || 'No reason provided.'}`;
+                document.getElementById('ban-notification-popup').style.display = 'flex';
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('nav').style.display = 'none';
+            } else if (userData.unbanMessage && !userData.shownUnbanMessage) {
+                document.getElementById('unban-notification-message').textContent = `Message from Admin: ${userData.unbanMessage}`;
+                document.getElementById('unban-notification-popup').style.display = 'flex';
+                await userRef.update({ shownUnbanMessage: true });
+            }
+        }
+
+        function closeBot() {
+            window.Telegram.WebApp.close();
+        }
+
+        function closeUnbanNotification() {
+            document.getElementById('unban-notification-popup').style.display = 'none';
         }
 
         function generateReferralCode(userId) {
@@ -767,6 +882,9 @@
                         referralLink: `${baseReferralUrl}${referralCode}`,
                         invitedUsers: [],
                         isBanned: false,
+                        banMessage: '',
+                        unbanMessage: '',
+                        shownUnbanMessage: false,
                         withdrawalHistory: [],
                         notices: [],
                         shownNotices: [],
@@ -788,6 +906,7 @@
                 console.log('User data loaded:', userData);
 
                 await checkForNotices();
+                await checkWithdrawStatus();
             } catch (error) {
                 console.error('Error initializing user:', error);
                 document.getElementById('admin-access-message').textContent = 'Error initializing user: ' + error.message;
@@ -925,8 +1044,38 @@
             }
         }
 
+        async function checkWithdrawStatus() {
+            if (!currentUser || !db) return;
+            const userRef = db.collection('users').doc(currentUser.id.toString());
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            const withdrawalHistory = userData.withdrawalHistory || [];
+            const shownStatuses = userData.shownWithdrawStatuses || [];
+
+            for (const withdraw of withdrawalHistory) {
+                const timestamp = withdraw.timestamp;
+                if (!shownStatuses.includes(timestamp) && (withdraw.status === 'Paid' || withdraw.status === 'Cancelled')) {
+                    let message = '';
+                    if (withdraw.status === 'Paid') {
+                        message = `Your withdrawal of ${withdraw.amount} coins via ${withdraw.method} has been paid!`;
+                    } else {
+                        message = `Your withdrawal of ${withdraw.amount} coins via ${withdraw.method} was cancelled. Reason: ${withdraw.cancelReason || 'No reason provided.'}`;
+                    }
+                    document.getElementById('withdraw-status-message').textContent = message;
+                    document.getElementById('withdraw-status-popup').style.display = 'flex';
+                    await userRef.update({
+                        shownWithdrawStatuses: firebase.firestore.FieldValue.arrayUnion(timestamp)
+                    });
+                }
+            }
+        }
+
         function closeNoticePopup() {
             document.getElementById('notice-popup').style.display = 'none';
+        }
+
+        function closeWithdrawStatusPopup() {
+            document.getElementById('withdraw-status-popup').style.display = 'none';
         }
 
         document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
@@ -1021,7 +1170,8 @@
                     method,
                     details,
                     status: 'Pending',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    cancelReason: ''
                 })
             });
 
@@ -1065,20 +1215,15 @@
                         <p>Referred Friends: ${invitedUsernames.join(', ') || 'None'}</p>
                         <p>Total Referrals: ${user.invitedUsers ? user.invitedUsers.length : 0}</p>
                         <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
-                        <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status})`).join(', ') : 'None'}</p>
+                        <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status}${w.status === 'Cancelled' ? ', Reason: ' + (w.cancelReason || 'None') : ''})`).join(', ') : 'None'}</p>
                         <p>Referral Events: ${user.referralEvents ? user.referralEvents.map(e => `${e.referredUsername} joined and you earned ${e.coinsAwarded} coin(s)`).join(', ') : 'None'}</p>
-                        <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}')">
+                        <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}', this.value)">
                             <option value="">Select Action</option>
                             <option value="ban">Ban User</option>
                             <option value="unban">Unban User</option>
-                            <option value="add10">Add 10 Coins</option>
-                            <option value="subtract10">Subtract 10 Coins</option>
+                            <option value="addCoins">Add Coins</option>
+                            <option value="subtractCoins">Subtract Coins</option>
                         </select>
-                        <div class="coin-edit">
-                            <input type="number" id="coin-input-${doc.id}" placeholder="Enter amount" min="0">
-                            <button onclick="addCustomCoins('${doc.id}')">Add Coins</button>
-                            <button onclick="subtractCustomCoins('${doc.id}')">Subtract Coins</button>
-                        </div>
                     `;
                     userList.appendChild(userItem);
                     updateLiveCoins(doc.id, user.coins);
@@ -1103,11 +1248,13 @@
                         <p>Details: ${request.details}</p>
                         <p>Status: ${request.status}</p>
                         <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+                        ${request.status === 'Pending' ? `
                         <select id="withdraw-select-${doc.id}" onchange="updateWithdrawStatus('${doc.id}', this.value)">
                             <option value="">Select Action</option>
                             <option value="Paid">Mark as Paid</option>
                             <option value="Cancelled">Mark as Cancelled</option>
                         </select>
+                        ` : ''}
                     `;
                     withdrawList.appendChild(withdrawItem);
                 });
@@ -1116,76 +1263,164 @@
             });
         }
 
-        let selectedUserId = null;
-
-        function updateSelectedUser(userId) {
+        function updateSelectedUser(userId, action) {
             selectedUserId = userId;
+            selectedAction = action;
             const select = document.getElementById(`user-select-${userId}`);
-            const action = select.value;
-            if (action) {
-                handleUserAction(action);
-                select.value = "";
+            if (action === 'ban') {
+                document.getElementById('ban-confirm-popup').style.display = 'flex';
+            } else if (action === 'unban') {
+                document.getElementById('unban-confirm-popup').style.display = 'flex';
+            } else if (action === 'addCoins') {
+                document.getElementById('add-coins-input').value = '';
+                document.getElementById('add-coins-popup').style.display = 'flex';
+            } else if (action === 'subtractCoins') {
+                document.getElementById('subtract-coins-input').value = '';
+                document.getElementById('subtract-coins-popup').style.display = 'flex';
+            }
+            select.value = '';
+        }
+
+        function confirmBan(confirmed) {
+            document.getElementById('ban-confirm-popup').style.display = 'none';
+            if (confirmed) {
+                document.getElementById('ban-message-input').value = '';
+                document.getElementById('ban-message-popup').style.display = 'flex';
+            } else {
+                selectedUserId = null;
+                selectedAction = null;
             }
         }
 
-        async function handleUserAction(action) {
+        async function submitBanMessage() {
             if (!db || !selectedUserId) return;
-
+            const message = document.getElementById('ban-message-input').value;
+            if (!message) {
+                alert('Please enter a ban reason.');
+                return;
+            }
             const userRef = db.collection('users').doc(selectedUserId);
-            switch (action) {
-                case 'ban':
-                    await userRef.update({ isBanned: true });
-                    break;
-                case 'unban':
-                    await userRef.update({ isBanned: false });
-                    break;
-                case 'add10':
-                    await userRef.update({ coins: firebase.firestore.FieldValue.increment(10) });
-                    break;
-                case 'subtract10':
-                    await userRef.update({ coins: firebase.firestore.FieldValue.increment(-10) });
-                    break;
+            await userRef.update({
+                isBanned: true,
+                banMessage: message,
+                unbanMessage: '',
+                shownUnbanMessage: false
+            });
+            document.getElementById('ban-message-popup').style.display = 'none';
+            selectedUserId = null;
+            selectedAction = null;
+        }
+
+        function confirmUnban(confirmed) {
+            document.getElementById('unban-confirm-popup').style.display = 'none';
+            if (confirmed) {
+                document.getElementById('unban-message-input').value = '';
+                document.getElementById('unban-message-popup').style.display = 'flex';
+            } else {
+                selectedUserId = null;
+                selectedAction = null;
             }
         }
 
-        async function addCustomCoins(userId) {
-            if (!db) return;
-            const amountInput = document.getElementById(`coin-input-${userId}`).value;
-            const amount = parseInt(amountInput);
+        async function submitUnbanMessage() {
+            if (!db || !selectedUserId) return;
+            const message = document.getElementById('unban-message-input').value;
+            if (!message) {
+                alert('Please enter an unban message.');
+                return;
+            }
+            const userRef = db.collection('users').doc(selectedUserId);
+            await userRef.update({
+                isBanned: false,
+                banMessage: '',
+                unbanMessage: message,
+                shownUnbanMessage: false
+            });
+            document.getElementById('unban-message-popup').style.display = 'none';
+            selectedUserId = null;
+            selectedAction = null;
+        }
+
+        async function submitAddCoins() {
+            if (!db || !selectedUserId) return;
+            const amount = parseInt(document.getElementById('add-coins-input').value);
             if (isNaN(amount) || amount <= 0) {
                 alert('Please enter a valid positive number.');
                 return;
             }
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({ coins: firebase.firestore.FieldValue.increment(amount) });
-            document.getElementById(`coin-input-${userId}`).value = '';
+            const userRef = db.collection('users').doc(selectedUserId);
+            await userRef.update({
+                coins: firebase.firestore.FieldValue.increment(amount)
+            });
+            document.getElementById('add-coins-popup').style.display = 'none';
+            selectedUserId = null;
+            selectedAction = null;
         }
 
-        async function subtractCustomCoins(userId) {
-            if (!db) return;
-            const amountInput = document.getElementById(`coin-input-${userId}`).value;
-            const amount = parseInt(amountInput);
+        async function submitSubtractCoins() {
+            if (!db || !selectedUserId) return;
+            const amount = parseInt(document.getElementById('subtract-coins-input').value);
             if (isNaN(amount) || amount <= 0) {
                 alert('Please enter a valid positive number.');
                 return;
             }
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({ coins: firebase.firestore.FieldValue.increment(-amount) });
-            document.getElementById(`coin-input-${userId}`).value = '';
+            const userRef = db.collection('users').doc(selectedUserId);
+            await userRef.update({
+                coins: firebase.firestore.FieldValue.increment(-amount)
+            });
+            document.getElementById('subtract-coins-popup').style.display = 'none';
+            selectedUserId = null;
+            selectedAction = null;
+        }
+
+        function cancelAction() {
+            document.getElementById('add-coins-popup').style.display = 'none';
+            document.getElementById('subtract-coins-popup').style.display = 'none';
+            document.getElementById('cancel-reason-popup').style.display = 'none';
+            selectedUserId = null;
+            selectedAction = null;
+            selectedWithdrawId = null;
         }
 
         async function updateWithdrawStatus(requestId, status) {
+            selectedWithdrawId = requestId;
+            if (status === 'Paid') {
+                await handleWithdrawStatus(requestId, 'Paid');
+            } else if (status === 'Cancelled') {
+                document.getElementById('cancel-reason-input').value = '';
+                document.getElementById('cancel-reason-popup').style.display = 'flex';
+            }
+            document.getElementById(`withdraw-select-${requestId}`).value = '';
+        }
+
+        async function submitCancelReason() {
+            if (!db || !selectedWithdrawId) return;
+            const reason = document.getElementById('cancel-reason-input').value;
+            if (!reason) {
+                alert('Please enter a cancellation reason.');
+                return;
+            }
+            await handleWithdrawStatus(selectedWithdrawId, 'Cancelled', reason);
+            document.getElementById('cancel-reason-popup').style.display = 'none';
+            selectedWithdrawId = null;
+        }
+
+        async function handleWithdrawStatus(requestId, status, cancelReason = '') {
             if (!db) return;
 
             const requestRef = db.collection('withdraw_requests').doc(requestId);
             const request = (await requestRef.get()).data();
             await requestRef.update({ status });
+
             const userRef = db.collection('users').doc(request.telegramId.toString());
             const user = (await userRef.get()).data();
             const updatedHistory = user.withdrawalHistory.map(w => 
-                w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status } : w
+                w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status, cancelReason } : w
             );
-            await userRef.update({ withdrawalHistory: updatedHistory });
+            await userRef.update({
+                withdrawalHistory: updatedHistory,
+                shownWithdrawStatuses: user.shownWithdrawStatuses || []
+            });
         }
 
         async function sendNotice() {
@@ -1240,16 +1475,20 @@
                 referralLink: `https://lbbduser.github.io/lbbd-mini-app/?ref=${testId}`,
                 invitedUsers: [],
                 isBanned: false,
+                banMessage: '',
+                unbanMessage: '',
+                shownUnbanMessage: false,
                 withdrawalHistory: [],
                 notices: [],
                 shownNotices: [],
+                shownWithdrawStatuses: [],
                 hasJoinedBot: true,
                 referralEvents: [],
                 joinedAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 console.log('Test user added successfully:', testId);
                 document.getElementById('admin-access-message').textContent = `Test user ${username} added successfully!`;
-                loadAdminPanel(); // Refresh the user list to show the new user
+                loadAdminPanel();
             }).catch(error => {
                 console.error('Error adding test user:', error);
                 document.getElementById('admin-access-message').textContent = 'Error adding test user: ' + error.message;
