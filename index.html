@@ -462,6 +462,18 @@
             font-size: clamp(0.7rem, 1vw, 0.9rem);
         }
 
+        .admin-section .user-item .coin-edit {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            align-items: center;
+        }
+
+        .admin-section .user-item .coin-edit input {
+            width: 80px;
+            padding: 0.5rem;
+        }
+
         .admin-section .notice-form {
             display: flex;
             gap: 1rem;
@@ -528,6 +540,8 @@
             .app { padding: clamp(0.8rem, 1.5vw, 1rem); margin-bottom: clamp(8rem, 12vw, 10rem); }
             .admin-section .notice-form { flex-direction: column; }
             .admin-section .notice-form input { width: 100%; }
+            .admin-section .user-item .coin-edit { flex-direction: column; }
+            .admin-section .user-item .coin-edit input { width: 100%; }
         }
     </style>
 </head>
@@ -694,6 +708,7 @@
         const baseReferralUrl = 'https://lbbduser.github.io/lbbd-mini-app/?ref=';
         const adminPassword = 'hussainriyalbbd';
         let isAdminAuthenticated = false;
+        let testUserCounter = 0;
 
         function initTelegram() {
             const isTelegram = window.Telegram && window.Telegram.WebApp;
@@ -1059,6 +1074,11 @@
                             <option value="add10">Add 10 Coins</option>
                             <option value="subtract10">Subtract 10 Coins</option>
                         </select>
+                        <div class="coin-edit">
+                            <input type="number" id="coin-input-${doc.id}" placeholder="Enter amount" min="0">
+                            <button onclick="addCustomCoins('${doc.id}')">Add Coins</button>
+                            <button onclick="subtractCustomCoins('${doc.id}')">Subtract Coins</button>
+                        </div>
                     `;
                     userList.appendChild(userItem);
                     updateLiveCoins(doc.id, user.coins);
@@ -1128,6 +1148,32 @@
             }
         }
 
+        async function addCustomCoins(userId) {
+            if (!db) return;
+            const amountInput = document.getElementById(`coin-input-${userId}`).value;
+            const amount = parseInt(amountInput);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid positive number.');
+                return;
+            }
+            const userRef = db.collection('users').doc(userId);
+            await userRef.update({ coins: firebase.firestore.FieldValue.increment(amount) });
+            document.getElementById(`coin-input-${userId}`).value = '';
+        }
+
+        async function subtractCustomCoins(userId) {
+            if (!db) return;
+            const amountInput = document.getElementById(`coin-input-${userId}`).value;
+            const amount = parseInt(amountInput);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid positive number.');
+                return;
+            }
+            const userRef = db.collection('users').doc(userId);
+            await userRef.update({ coins: firebase.firestore.FieldValue.increment(-amount) });
+            document.getElementById(`coin-input-${userId}`).value = '';
+        }
+
         async function updateWithdrawStatus(requestId, status) {
             if (!db) return;
 
@@ -1178,17 +1224,20 @@
             }, 5000);
         }
 
-        function testFirestoreWrite() {
+        async function testFirestoreWrite() {
             if (!db) {
                 console.error('Firestore not initialized.');
                 document.getElementById('admin-access-message').textContent = 'Firestore not initialized.';
                 return;
             }
-            db.collection('users').doc('test123').set({
-                telegramId: 'test123',
-                username: 'TestUser',
+            testUserCounter++;
+            const testId = `test${testUserCounter}`;
+            const username = `TestUser${testUserCounter}`;
+            db.collection('users').doc(testId).set({
+                telegramId: testId,
+                username: username,
                 coins: 0,
-                referralLink: 'https://lbbduser.github.io/lbbd-mini-app/?ref=test123',
+                referralLink: `https://lbbduser.github.io/lbbd-mini-app/?ref=${testId}`,
                 invitedUsers: [],
                 isBanned: false,
                 withdrawalHistory: [],
@@ -1198,8 +1247,9 @@
                 referralEvents: [],
                 joinedAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                console.log('Test user added successfully.');
-                document.getElementById('admin-access-message').textContent = 'Test user added successfully!';
+                console.log('Test user added successfully:', testId);
+                document.getElementById('admin-access-message').textContent = `Test user ${username} added successfully!`;
+                loadAdminPanel(); // Refresh the user list to show the new user
             }).catch(error => {
                 console.error('Error adding test user:', error);
                 document.getElementById('admin-access-message').textContent = 'Error adding test user: ' + error.message;
