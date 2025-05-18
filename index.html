@@ -129,6 +129,7 @@
         .invite-page p,
         .withdraw-page p,
         .about-page p,
+        .profile-page p,
         .admin-page p {
             font-size: clamp(0.9rem, 1.5vw, 1.2rem);
             color: #e6e6ff;
@@ -508,6 +509,10 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
             animation: popupFadeIn 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 250px;
         }
 
         @keyframes popupFadeIn {
@@ -536,6 +541,36 @@
             font-size: clamp(0.8rem, 1.2vw, 0.9rem);
             margin-top: 0.5rem;
             display: none;
+        }
+
+        .popup .button-group {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .popup button {
+            flex: 1;
+            padding: clamp(0.6rem, 1vw, 0.8rem) clamp(1.3rem, 2vw, 1.8rem);
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            border-radius: 30px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #8a00ff, #c200ff);
+            color: #fff;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup button:hover {
+            transform: translateY(-6px) translateZ(25px) rotateX(12deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .popup button:active {
+            transform: translateY(0) translateZ(0) scale(0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         /* Loading Spinner */
@@ -695,6 +730,17 @@
                 <span data-lang="bn" style="display: none;">হ্যামস্টার কম্ব্যাটের মতো, এলবিবিডি কমিউনিটি @earn_by_lbbd_bot এর সাথে ট্যাপ-২-আর্ন চালু করছে। এখনই যোগ দিন!</span>
             </div>
         </div>
+        <div class="page profile-page" id="profile">
+            <h2 data-lang="en">Your Profile</h2>
+            <h2 data-lang="bn" style="display: none;">আপনার প্রোফাইল</h2>
+            <p id="profile-username">Username: Loading...</p>
+            <p id="profile-id">Telegram ID: Loading...</p>
+            <p id="profile-joined">Joined: Loading...</p>
+            <p id="profile-referral">Referral Link: Loading...</p>
+            <h3 data-lang="en">Coin Transaction History</h3>
+            <h3 data-lang="bn" style="display: none;">কয়েন লেনদেনের ইতিহাস</h3>
+            <div id="transaction-history" class="transaction-history"></div>
+        </div>
         <div class="page admin-page" id="admin">
             <h2 data-lang="en">Admin Panel</h2>
             <h2 data-lang="bn" style="display: none;">অ্যাডমিন প্যানেল</h2>
@@ -742,6 +788,8 @@
         <button id="nav-withdraw" data-lang="bn" style="display: none;">উত্তোলন</button>
         <button id="nav-about" data-lang="en">About</button>
         <button id="nav-about" data-lang="bn" style="display: none;">সম্পর্কে</button>
+        <button id="nav-profile" data-lang="en">Profile</button>
+        <button id="nav-profile" data-lang="bn" style="display: none;">প্রোফাইল</button>
         <button id="nav-admin" data-lang="en">Admin</button>
         <button id="nav-admin" data-lang="bn" style="display: none;">অ্যাডমিন</button>
     </div>
@@ -750,10 +798,12 @@
             <h3 data-lang="en">Admin Access</h3>
             <h3 data-lang="bn" style="display: none;">অ্যাডমিন অ্যাক্সেস</h3>
             <input type="password" id="admin-password" placeholder="Enter admin password">
-            <button onclick="checkAdminPassword()" data-lang="en">Submit</button>
-            <button onclick="checkAdminPassword()" data-lang="bn" style="display: none;">জমা দিন</button>
-            <button onclick="closePopup()" data-lang="en">Cancel</button>
-            <button onclick="closePopup()" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="checkAdminPassword()" data-lang="en">Submit</button>
+                <button onclick="checkAdminPassword()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="closePopup()" data-lang="en">Cancel</button>
+                <button onclick="closePopup()" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
             <p class="error-message" id="admin-error" data-lang="en">Incorrect password. Please try again.</p>
             <p class="error-message" id="admin-error-bn" data-lang="bn" style="display: none;">ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।</p>
         </div>
@@ -763,8 +813,10 @@
             <h3 data-lang="en">Admin Notice</h3>
             <h3 data-lang="bn" style="display: none;">অ্যাডমিন নোটিশ</h3>
             <p id="notice-message"></p>
-            <button onclick="closeNoticePopup()" data-lang="en">Close</button>
-            <button onclick="closeNoticePopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+            <div class="button-group">
+                <button onclick="closeNoticePopup()" data-lang="en">Close</button>
+                <button onclick="closeNoticePopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-confirm-popup">
@@ -773,10 +825,12 @@
             <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা নিশ্চিত করুন</h3>
             <p data-lang="en">Are you sure you want to ban this user?</p>
             <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে নিষিদ্ধ করতে চান?</p>
-            <button onclick="confirmBan(true)" data-lang="en">OK</button>
-            <button onclick="confirmBan(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-            <button onclick="confirmBan(false)" data-lang="en">Cancel</button>
-            <button onclick="confirmBan(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="confirmBan(true)" data-lang="en">OK</button>
+                <button onclick="confirmBan(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+                <button onclick="confirmBan(false)" data-lang="en">Cancel</button>
+                <button onclick="confirmBan(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-message-popup">
@@ -786,8 +840,10 @@
             <p data-lang="en">Type a message explaining why this user is being banned:</p>
             <p data-lang="bn" style="display: none;">এই ব্যবহারকারীকে কেন নিষিদ্ধ করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
             <textarea id="ban-message-input" placeholder="Enter ban reason"></textarea>
-            <button onclick="submitBanMessage()" data-lang="en">Submit</button>
-            <button onclick="submitBanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <div class="button-group">
+                <button onclick="submitBanMessage()" data-lang="en">Submit</button>
+                <button onclick="submitBanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-confirm-popup">
@@ -796,10 +852,12 @@
             <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা তুলে নেওয়া নিশ্চিত করুন</h3>
             <p data-lang="en">Are you sure you want to unban this user?</p>
             <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীর নিষেধাজ্ঞা তুলে নিতে চান?</p>
-            <button onclick="confirmUnban(true)" data-lang="en">OK</button>
-            <button onclick="confirmUnban(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-            <button onclick="confirmUnban(false)" data-lang="en">Cancel</button>
-            <button onclick="confirmUnban(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="confirmUnban(true)" data-lang="en">OK</button>
+                <button onclick="confirmUnban(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+                <button onclick="confirmUnban(false)" data-lang="en">Cancel</button>
+                <button onclick="confirmUnban(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-message-popup">
@@ -809,8 +867,10 @@
             <p data-lang="en">Type a special message for this user:</p>
             <p data-lang="bn" style="display: none;">এই ব্যবহারকারীর জন্য একটি বিশেষ বার্তা টাইপ করুন:</p>
             <textarea id="unban-message-input" placeholder="Enter unban message"></textarea>
-            <button onclick="submitUnbanMessage()" data-lang="en">Submit</button>
-            <button onclick="submitUnbanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <div class="button-group">
+                <button onclick="submitUnbanMessage()" data-lang="en">Submit</button>
+                <button onclick="submitUnbanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-notification-popup">
@@ -818,8 +878,10 @@
             <h3 data-lang="en">You Are Banned</h3>
             <h3 data-lang="bn" style="display: none;">আপনি নিষিদ্ধ হয়েছেন</h3>
             <p id="ban-notification-message"></p>
-            <button onclick="closeBot()" data-lang="en">Cancel</button>
-            <button onclick="closeBot()" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="closeBot()" data-lang="en">Cancel</button>
+                <button onclick="closeBot()" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-notification-popup">
@@ -829,8 +891,10 @@
             <p data-lang="en">You have been unbanned!</p>
             <p data-lang="bn" style="display: none;">আপনার নিষেধাজ্ঞা তুলে নেওয়া হয়েছে!</p>
             <p id="unban-notification-message"></p>
-            <button onclick="closeUnbanNotification()" data-lang="en">OK</button>
-            <button onclick="closeUnbanNotification()" data-lang="bn" style="display: none;">ঠিক আছে</button>
+            <div class="button-group">
+                <button onclick="closeUnbanNotification()" data-lang="en">OK</button>
+                <button onclick="closeUnbanNotification()" data-lang="bn" style="display: none;">ঠিক আছে</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="add-coins-popup">
@@ -840,10 +904,12 @@
             <p data-lang="en">Enter the amount of coins to add:</p>
             <p data-lang="bn" style="display: none;">যোগ করার জন্য কয়েনের পরিমাণ লিখুন:</p>
             <input type="number" id="add-coins-input" placeholder="Enter amount" min="1">
-            <button onclick="submitAddCoins()" data-lang="en">Submit</button>
-            <button onclick="submitAddCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
-            <button onclick="cancelAction()" data-lang="en">Cancel</button>
-            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="submitAddCoins()" data-lang="en">Submit</button>
+                <button onclick="submitAddCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="cancelAction()" data-lang="en">Cancel</button>
+                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="subtract-coins-popup">
@@ -855,10 +921,12 @@
             <input type="number" id="subtract-coins-input" placeholder="Enter amount" min="1">
             <p id="subtract-error" class="error-message" data-lang="en" style="display: none;">Cannot subtract: User has 0 coins.</p>
             <p id="subtract-error-bn" class="error-message" data-lang="bn" style="display: none;">বিয়োগ করা যাবে না: ব্যবহারকারীর ০ কয়েন আছে।</p>
-            <button onclick="submitSubtractCoins()" data-lang="en">Submit</button>
-            <button onclick="submitSubtractCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
-            <button onclick="cancelAction()" data-lang="en">Cancel</button>
-            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="submitSubtractCoins()" data-lang="en">Submit</button>
+                <button onclick="submitSubtractCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="cancelAction()" data-lang="en">Cancel</button>
+                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="withdraw-status-popup">
@@ -866,8 +934,10 @@
             <h3 data-lang="en">Withdrawal Status</h3>
             <h3 data-lang="bn" style="display: none;">উত্তোলনের অবস্থা</h3>
             <p id="withdraw-status-message"></p>
-            <button onclick="closeWithdrawStatusPopup()" data-lang="en">Close</button>
-            <button onclick="closeWithdrawStatusPopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+            <div class="button-group">
+                <button onclick="closeWithdrawStatusPopup()" data-lang="en">Close</button>
+                <button onclick="closeWithdrawStatusPopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="cancel-reason-popup">
@@ -877,10 +947,12 @@
             <p data-lang="en">Type a message explaining why this withdrawal is being cancelled:</p>
             <p data-lang="bn" style="display: none;">এই উত্তোলন কেন বাতিল করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
             <textarea id="cancel-reason-input" placeholder="Enter cancellation reason"></textarea>
-            <button onclick="submitCancelReason()" data-lang="en">Submit</button>
-            <button onclick="submitCancelReason()" data-lang="bn" style="display: none;">জমা দিন</button>
-            <button onclick="cancelAction()" data-lang="en">Cancel</button>
-            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="submitCancelReason()" data-lang="en">Submit</button>
+                <button onclick="submitCancelReason()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="cancelAction()" data-lang="en">Cancel</button>
+                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <div class="popup-overlay" id="delete-confirm-popup">
@@ -889,10 +961,12 @@
             <h3 data-lang="bn" style="display: none;">মুছে ফেলা নিশ্চিত করুন</h3>
             <p data-lang="en">Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
             <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না এবং সমস্ত ব্যবহারকারীর ডেটা হারিয়ে যাবে।</p>
-            <button onclick="confirmDelete(true)" data-lang="en">OK</button>
-            <button onclick="confirmDelete(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-            <button onclick="confirmDelete(false)" data-lang="en">Cancel</button>
-            <button onclick="confirmDelete(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            <div class="button-group">
+                <button onclick="confirmDelete(true)" data-lang="en">OK</button>
+                <button onclick="confirmDelete(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+                <button onclick="confirmDelete(false)" data-lang="en">Cancel</button>
+                <button onclick="confirmDelete(false)" data-lang="bn" style="display: none;">বাতিল</button>
+            </div>
         </div>
     </div>
     <script>
@@ -1085,6 +1159,7 @@
                 document.getElementById('friends-invited-bn').textContent = `আমন্ত্রিত বন্ধুরা: ${friendsInvited}`;
                 await userRef.update({ hasJoinedBot: true });
                 console.log('User data loaded:', userData);
+                updateProfile(userData);
 
                 await checkForNotices();
                 await checkWithdrawStatus();
@@ -1181,6 +1256,8 @@
             document.getElementById(pageId).classList.add('active');
             if (pageId === 'admin' && !isAdminAuthenticated) {
                 showAdminPopup();
+            } else if (pageId === 'profile') {
+                loadProfile();
             }
         }
 
@@ -1265,6 +1342,7 @@
         document.getElementById('nav-invite').addEventListener('click', () => showPage('invite'));
         document.getElementById('nav-withdraw').addEventListener('click', () => showPage('withdraw'));
         document.getElementById('nav-about').addEventListener('click', () => showPage('about'));
+        document.getElementById('nav-profile').addEventListener('click', () => showPage('profile'));
         document.getElementById('nav-admin').addEventListener('click', () => {
             if (isAdminAuthenticated) {
                 showPage('admin');
@@ -1361,78 +1439,57 @@
 
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
-            db.collection('users').onSnapshot(async (snapshot) => {
-                if (snapshot.empty) {
-                    userList.innerHTML = '<p>No users found.</p>';
-                    console.log('No users in database.');
-                    return;
-                }
+            db.collection('users').onSnapshot(snapshot => {
                 userList.innerHTML = '';
-                for (const doc of snapshot.docs) {
+                snapshot.forEach(doc => {
                     const user = doc.data();
-                    console.log('User loaded:', user);
-                    const invitedUsernames = [];
-                    for (const id of user.invitedUsers || []) {
-                        const invitedUserDoc = await db.collection('users').doc(id.toString()).get();
-                        const invitedUserData = invitedUserDoc.data();
-                        invitedUsernames.push(invitedUserData ? invitedUserData.username || 'Unknown' : 'Unknown');
-                    }
+                    const userId = doc.id;
                     const userItem = document.createElement('div');
                     userItem.className = 'user-item';
                     userItem.innerHTML = `
-                        <p>Telegram Username: ${user.username || 'Anonymous'}</p>
-                        <p>Telegram ID: ${user.telegramId}</p>
-                        <p>Coins: <span id="coin-${doc.id}">${user.coins}</span></p>
-                        <p>Referred Friends: ${invitedUsernames.join(', ') || 'None'}</p>
-                        <p>Total Referrals: ${user.invitedUsers ? user.invitedUsers.length : 0}</p>
-                        <p>Status: ${user.isBanned ? 'Banned' : 'Active'}</p>
-                        <p>Withdrawal History: ${user.withdrawalHistory ? user.withdrawalHistory.map(w => `${w.amount} coins via ${w.method} (${w.status}${w.status === 'Cancelled' ? ', Reason: ' + (w.cancelReason || 'None') : ''})`).join(', ') : 'None'}</p>
-                        <p>Referral Events: ${user.referralEvents ? user.referralEvents.map(e => `${e.referredUsername} joined and you earned ${e.coinsAwarded} coin(s)`).join(', ') : 'None'}</p>
-                        <select id="user-select-${doc.id}" onchange="updateSelectedUser('${doc.id}', this.value)">
+                        <p data-lang="en">ID: ${userId} | Username: ${user.username || 'Anonymous'}</p>
+                        <p data-lang="bn" style="display: none;">আইডি: ${userId} | ব্যবহারকারীর নাম: ${user.username || 'অজানা'}</p>
+                        <p data-lang="en">Coins: <span id="coin-${userId}">${user.coins || 0}</span> | Banned: ${user.isBanned ? 'Yes' : 'No'}</p>
+                        <p data-lang="bn" style="display: none;">কয়েন: <span id="coin-${userId}">${user.coins || 0}</span> | নিষিদ্ধ: ${user.isBanned ? 'হ্যাঁ' : 'না'}</p>
+                        <select id="user-select-${userId}" onchange="updateSelectedUser('${userId}', this.value)">
                             <option value="">Select Action</option>
-                            <option value="ban">Ban User</option>
-                            <option value="unban">Unban User</option>
+                            <option value="ban">${user.isBanned ? 'Update Ban Reason' : 'Ban'}</option>
+                            <option value="unban">${user.isBanned ? 'Unban' : '---'}</option>
                             <option value="addCoins">Add Coins</option>
                             <option value="subtractCoins">Subtract Coins</option>
                             <option value="delete">Delete User</option>
                         </select>
                     `;
                     userList.appendChild(userItem);
-                    updateLiveCoins(doc.id, user.coins);
-                }
-                updateDashboardSummary();
-            }, (error) => {
-                console.error('Error loading users:', error);
-                document.getElementById('admin-access-message').textContent = 'Error loading users: ' + error.message;
+                });
             });
 
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
-            db.collection('withdraw_requests').onSnapshot((snapshot) => {
+            db.collection('withdraw_requests').onSnapshot(snapshot => {
                 withdrawList.innerHTML = '';
                 snapshot.forEach(doc => {
                     const withdraw = doc.data();
+                    const withdrawId = doc.id;
                     const withdrawItem = document.createElement('div');
                     withdrawItem.className = 'withdraw-item';
                     withdrawItem.innerHTML = `
-                        <p>Telegram Username: ${withdraw.username || 'Anonymous'}</p>
-                        <p>Telegram ID: ${withdraw.telegramId}</p>
-                        <p>Amount: ${withdraw.amount} coins</p>
-                        <p>Method: ${withdraw.method}</p>
-                        <p>Details: ${withdraw.details}</p>
-                        <p>Status: ${withdraw.status}</p>
-                        <p>Timestamp: ${withdraw.timestamp ? withdraw.timestamp.toDate().toLocaleString() : 'N/A'}</p>
-                        <select id="withdraw-select-${doc.id}" onchange="updateSelectedWithdraw('${doc.id}', this.value)">
-                            <option value="">Select Action</option>
-                            <option value="pay">Pay</option>
-                            <option value="cancel">Cancel</option>
-                        </select>
+                        <p data-lang="en">ID: ${withdrawId} | User: ${withdraw.username || 'Anonymous'} (${withdraw.telegramId})</p>
+                        <p data-lang="bn" style="display: none;">আইডি: ${withdrawId} | ব্যবহারকারী: ${withdraw.username || 'অজানা'} (${withdraw.telegramId})</p>
+                        <p data-lang="en">Amount: ${withdraw.amount} | Method: ${withdraw.method} | Details: ${withdraw.details}</p>
+                        <p data-lang="bn" style="display: none;">পরিমাণ: ${withdraw.amount} | পদ্ধতি: ${withdraw.method} | বিস্তারিত: ${withdraw.details}</p>
+                        <p data-lang="en">Status: ${withdraw.status} | Requested: ${withdraw.timestamp.toDate().toLocaleString()}</p>
+                        <p data-lang="bn" style="display: none;">অবস্থা: ${withdraw.status} | অনুরোধ করা হয়েছে: ${withdraw.timestamp.toDate().toLocaleString()}</p>
+                        ${withdraw.status === 'Pending' ? `
+                            <select onchange="updateSelectedWithdraw('${withdrawId}', this.value)">
+                                <option value="">Select Action</option>
+                                <option value="pay">Pay</option>
+                                <option value="cancel">Cancel</option>
+                            </select>
+                        ` : ''}
                     `;
                     withdrawList.appendChild(withdrawItem);
                 });
-            }, (error) => {
-                console.error('Error loading withdrawals:', error);
-                document.getElementById('admin-access-message').textContent = 'Error loading withdrawals: ' + error.message;
             });
         }
 
@@ -1518,6 +1575,17 @@
             const newCoins = (userData.coins || 0) + amount;
             await userRef.update({ coins: newCoins });
             updateLiveCoins(selectedUserId, newCoins);
+
+            // Add transaction to history
+            await userRef.update({
+                transactionHistory: firebase.firestore.FieldValue.arrayUnion({
+                    type: 'Credit',
+                    amount: amount,
+                    reason: 'Admin Added',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+            });
+
             document.getElementById('add-coins-popup').style.display = 'none';
             resetUserSelect();
         }
@@ -1544,6 +1612,17 @@
             const newCoins = currentCoins - amount;
             await userRef.update({ coins: newCoins });
             updateLiveCoins(selectedUserId, newCoins);
+
+            // Add transaction to history
+            await userRef.update({
+                transactionHistory: firebase.firestore.FieldValue.arrayUnion({
+                    type: 'Debit',
+                    amount: amount,
+                    reason: 'Admin Subtracted',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+            });
+
             document.getElementById('subtract-coins-popup').style.display = 'none';
             resetUserSelect();
         }
@@ -1636,6 +1715,16 @@
                 withdrawalHistory: updatedHistory
             });
 
+            // Add transaction to history
+            await userRef.update({
+                transactionHistory: firebase.firestore.FieldValue.arrayUnion({
+                    type: 'Credit',
+                    amount: withdrawData.amount,
+                    reason: 'Withdrawal Cancelled',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+            });
+
             document.getElementById('cancel-reason-popup').style.display = 'none';
             selectedWithdrawId = null;
         }
@@ -1724,6 +1813,7 @@
                     shownNotices: [],
                     hasJoinedBot: true,
                     referralEvents: [],
+                    transactionHistory: [],
                     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 document.getElementById('admin-access-message').textContent = `Test user ${testUserId} created successfully!`;
@@ -1756,6 +1846,65 @@
                     elem.style.display = 'none';
                 }
             });
+        }
+
+        function updateProfile(userData) {
+            document.getElementById('profile-username').textContent = `Username: ${userData.username || 'Anonymous'}`;
+            document.getElementById('profile-id').textContent = `Telegram ID: ${userData.telegramId}`;
+            document.getElementById('profile-joined').textContent = `Joined: ${userData.joinedAt ? userData.joinedAt.toDate().toLocaleDateString() : 'Unknown'}`;
+            document.getElementById('profile-referral').textContent = `Referral Link: ${userData.referralLink}`;
+        }
+
+        async function loadProfile() {
+            if (!currentUser || !db) return;
+            const userRef = db.collection('users').doc(currentUser.id.toString());
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            updateProfile(userData);
+
+            const transactionList = document.getElementById('transaction-history');
+            transactionList.innerHTML = '';
+            const transactions = userData.transactionHistory || [];
+            const referralEvents = userData.referralEvents || [];
+            const withdrawalHistory = userData.withdrawalHistory || [];
+
+            referralEvents.forEach(event => {
+                transactions.push({
+                    type: 'Credit',
+                    amount: event.coinsAwarded,
+                    reason: `Referral - ${event.referredUsername}`,
+                    timestamp: event.timestamp
+                });
+            });
+
+            withdrawalHistory.forEach(withdraw => {
+                transactions.push({
+                    type: 'Debit',
+                    amount: withdraw.amount,
+                    reason: `Withdrawal - ${withdraw.method} (${withdraw.status})`,
+                    timestamp: firebase.firestore.Timestamp.fromDate(new Date(withdraw.timestamp))
+                });
+            });
+
+            transactions.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+
+            if (transactions.length === 0) {
+                const noTransaction = document.createElement('p');
+                noTransaction.textContent = currentLanguage === 'en' ? 'No transactions yet.' : 'এখনো কোনো লেনদেন নেই।';
+                transactionList.appendChild(noTransaction);
+            } else {
+                transactions.forEach(tx => {
+                    const txItem = document.createElement('div');
+                    txItem.className = 'transaction-item';
+                    txItem.style = 'background: rgba(255, 255, 255, 0.05); padding: 0.5rem; margin: 0.5rem 0; border-radius: 10px;';
+                    const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Unknown';
+                    txItem.innerHTML = `
+                        <p data-lang="en">${tx.type}: ${tx.amount} coins | ${tx.reason} | ${date}</p>
+                        <p data-lang="bn" style="display: none;">${tx.type === 'Credit' ? 'ক্রেডিট' : 'ডেবিট'}: ${tx.amount} কয়েন | ${tx.reason} | ${date}</p>
+                    `;
+                    transactionList.appendChild(txItem);
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
