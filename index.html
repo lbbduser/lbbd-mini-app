@@ -484,6 +484,19 @@
             width: 70%;
         }
 
+        .summary-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-section p {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            margin: 0.5rem 0;
+        }
+
         /* Popup Styles */
         .popup-overlay {
             display: none;
@@ -600,6 +613,12 @@
             <h2>Admin Panel</h2>
             <button onclick="testFirestoreWrite()">Test Firestore Write</button>
             <p id="admin-access-message">Welcome, Admin!</p>
+            <div class="summary-section">
+                <h3>Dashboard Summary</h3>
+                <p>Total Users: <span id="total-users">0</span></p>
+                <p>Total Coins in Circulation: <span id="total-coins">0</span></p>
+                <p>Pending Withdrawals: <span id="pending-withdrawals">0</span></p>
+            </div>
             <div class="admin-section">
                 <h3>User Management</h3>
                 <div class="user-list" id="user-list"></div>
@@ -1196,6 +1215,9 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
+            // Load Dashboard Summary
+            updateDashboardSummary();
+
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
             db.collection('users').onSnapshot(async (snapshot) => {
@@ -1237,6 +1259,7 @@
                     userList.appendChild(userItem);
                     updateLiveCoins(doc.id, user.coins);
                 }
+                updateDashboardSummary();
             }, (error) => {
                 console.error('Error loading users:', error);
                 document.getElementById('admin-access-message').textContent = 'Error loading users: ' + error.message;
@@ -1267,9 +1290,26 @@
                     `;
                     withdrawList.appendChild(withdrawItem);
                 });
+                updateDashboardSummary();
             }, (error) => {
                 console.error('Error loading withdrawal requests:', error);
             });
+        }
+
+        async function updateDashboardSummary() {
+            if (!db) return;
+            const usersSnapshot = await db.collection('users').get();
+            const totalUsers = usersSnapshot.size;
+            let totalCoins = 0;
+            usersSnapshot.forEach(doc => {
+                totalCoins += doc.data().coins || 0;
+            });
+            const withdrawSnapshot = await db.collection('withdraw_requests').where('status', '==', 'Pending').get();
+            const pendingWithdrawals = withdrawSnapshot.size;
+
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('total-coins').textContent = totalCoins;
+            document.getElementById('pending-withdrawals').textContent = pendingWithdrawals;
         }
 
         function updateSelectedUser(userId, action) {
@@ -1333,6 +1373,7 @@
             // Delete the user document
             await userRef.delete();
             document.getElementById('admin-access-message').textContent = `User ${userData.username || 'Unknown'} deleted successfully!`;
+            updateDashboardSummary();
         }
 
         function confirmBan(confirmed) {
