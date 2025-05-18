@@ -14,14 +14,14 @@
             font-family: 'Segoe UI', Arial, sans-serif;
         }
 
-        html {
+        html, body {
             height: 100%;
+            overflow-x: hidden;
         }
 
         body {
             background: linear-gradient(135deg, #0a0a25, #250a45);
             color: #fff;
-            overflow-x: hidden;
             min-height: 100vh;
             position: relative;
             margin: 0;
@@ -49,37 +49,41 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
             z-index: 1000;
             animation: fadeOut 1s ease-in-out 3s forwards;
         }
 
         .splash h1 {
-            font-size: clamp(2rem, 8vw, 8rem);
+            font-size: clamp(2rem, 5vw, 4rem);
             text-transform: uppercase;
-            letter-spacing: 0.7rem;
+            letter-spacing: 0.5rem;
             background: linear-gradient(45deg, #fff, #ffd700);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             animation: pulse 1s infinite;
             text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 15px #ffd700;
+            margin-bottom: 1rem;
         }
 
-        .splash p {
-            position: absolute;
-            bottom: 2rem;
-            font-size: clamp(0.8rem, 1vw, 1rem);
+        .splash a {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
             color: #ffd700;
-            opacity: 0.9;
-            animation: slideUp 1s ease-in-out;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .splash a:hover {
+            color: #fff;
+            text-shadow: 0 0 12px #ffd700;
         }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 0.9; } }
 
         .app {
-            max-width: 600px;
+            max-width: 1200px;
             margin: 2rem auto 7rem;
             padding: 1.5rem;
             opacity: 0;
@@ -98,7 +102,6 @@
             box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: slideIn 0.7s ease-in-out;
-            transition: transform 0.4s;
         }
 
         .page.active { display: block; }
@@ -106,14 +109,14 @@
         @keyframes slideIn { from { transform: translateY(80px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
         h2 {
-            font-size: clamp(1.4rem, 2.5vw, 1.7rem);
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
             margin-bottom: 1.3rem;
             color: #ffd700;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         .balance-page p {
-            font-size: clamp(1.8rem, 3vw, 2.3rem);
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
             font-weight: bold;
             background: linear-gradient(45deg, #ffd700, #fff);
             -webkit-background-clip: text;
@@ -127,7 +130,7 @@
         .withdraw-page p,
         .about-page p,
         .admin-page p {
-            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
             color: #e6e6ff;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -156,7 +159,6 @@
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
         button::before {
@@ -211,7 +213,6 @@
         button:focus,
         button:active {
             outline: none;
-            -webkit-tap-highlight-color: transparent;
             background: linear-gradient(45deg, #8a00ff, #c200ff);
         }
 
@@ -229,7 +230,7 @@
             box-shadow: 0 10px 30px rgba(138, 0, 255, 0.7);
         }
 
-        input {
+        input, textarea {
             width: 100%;
             padding: clamp(0.7rem, 1vw, 0.9rem);
             margin: clamp(0.5rem, 0.8vw, 0.7rem) 0;
@@ -261,7 +262,7 @@
             cursor: pointer;
         }
 
-        select:focus, input:focus {
+        select:focus, input:focus, textarea:focus {
             outline: none;
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.7);
             transform: scale(1.02);
@@ -285,22 +286,8 @@
         select option[value="Binance"] { color: #f0b90b; }
         select option[value="Crypto"] { color: #00b7eb; }
 
-        input::placeholder { color: #ccc; opacity: 0.8; }
+        input::placeholder, textarea::placeholder { color: #ccc; opacity: 0.8; }
         input#amount.invalid { box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.7); }
-
-        input:focus::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: clamp(1rem, 1.5vw, 1.2rem);
-            background: #ffd700;
-            animation: cursorGlow 1s infinite;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        @keyframes cursorGlow { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .nav {
             position: fixed;
@@ -441,7 +428,6 @@
             margin-bottom: clamp(0.8rem, 1.5vw, 1rem);
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
         }
 
         .admin-section .user-item select,
@@ -552,40 +538,129 @@
             display: none;
         }
 
-        @media (max-width: 600px) {
-            .nav { flex-direction: row; align-items: center; }
-            .nav button { margin: 0 clamp(0.1rem, 0.3vw, 0.2rem); width: auto; }
-            .app { padding: clamp(0.8rem, 1.5vw, 1rem); margin-bottom: clamp(8rem, 12vw, 10rem); }
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ffd700;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+
+        .language-toggle select {
+            width: auto;
+            padding: 0.5rem;
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app {
+                padding: clamp(1rem, 2vw, 1.5rem);
+                margin: 1rem 0.5rem 6rem;
+                max-width: 100%;
+            }
+            .nav { padding: 0.5rem; }
+            .nav button {
+                font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+                padding: 0.5rem;
+            }
             .admin-section .notice-form { flex-direction: column; }
             .admin-section .notice-form input { width: 100%; }
             .admin-section .user-item .coin-edit { flex-direction: column; }
             .admin-section .user-item .coin-edit input { width: 100%; }
         }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .app {
+                max-width: 800px;
+                padding: 2rem;
+            }
+            .nav button {
+                font-size: clamp(0.8rem, 1.2vw, 1rem);
+                padding: 0.7rem;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .app {
+                max-width: 1000px;
+                padding: 2.5rem;
+            }
+            .nav button {
+                font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+                padding: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div class="language-toggle">
+        <select id="language-select" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+        </select>
+    </div>
     <canvas id="particles"></canvas>
     <div class="splash" id="splash">
         <h1>LBBD COMMUNITY</h1>
-        <p>@Developed by LBBD COMMUNITY</p>
+        <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a>
     </div>
     <div class="app" id="app">
         <div class="page balance-page" id="balance">
-            <h2>Your Balance</h2>
+            <h2 data-lang="en">Your Balance</h2>
+            <h2 data-lang="bn" style="display: none;">আপনার ব্যালেন্স</h2>
             <p id="balance-amount">0 Coins</p>
-            <p>Current coin value: To be announced soon!</p>
+            <p data-lang="en">Current coin value: To be announced soon!</p>
+            <p data-lang="bn" style="display: none;">বর্তমান কয়েন মূল্য: শীঘ্রই ঘোষণা করা হবে!</p>
         </div>
         <div class="page invite-page" id="invite">
-            <h2>Invite</h2>
-            <p>Share your unique referral link and earn 1 coin per friend who joins @earn_by_lbbd_bot!</p>
+            <h2 data-lang="en">Invite</h2>
+            <h2 data-lang="bn" style="display: none;">আমন্ত্রণ</h2>
+            <p data-lang="en">Share your unique referral link and earn 1 coin per friend who joins @earn_by_lbbd_bot!</p>
+            <p data-lang="bn" style="display: none;">আপনার অনন্য রেফারেল লিঙ্ক শেয়ার করুন এবং প্রতি বন্ধু যিনি @earn_by_lbbd_bot এ যোগ দেন তার জন্য ১ কয়েন উপার্জন করুন!</p>
             <p id="referral-link">Generating your link...</p>
-            <p id="friends-invited">Friends Invited: 0</p>
+            <p id="friends-invited" data-lang="en">Friends Invited: 0</p>
+            <p id="friends-invited-bn" data-lang="bn" style="display: none;">আমন্ত্রিত বন্ধুরা: ০</p>
             <p id="invite-status"></p>
-            <button class="action-button" onclick="shareBot()">Share @earn_by_lbbd_bot</button>
+            <button class="action-button" onclick="shareBot()" data-lang="en">Share @earn_by_lbbd_bot</button>
+            <button class="action-button" onclick="shareBot()" data-lang="bn" style="display: none;">@earn_by_lbbd_bot শেয়ার করুন</button>
         </div>
         <div class="page withdraw-page" id="withdraw">
-            <h2>Withdraw Coins</h2>
-            <p>Minimum withdrawal amount: To be announced soon!</p>
+            <h2 data-lang="en">Withdraw Coins</h2>
+            <h2 data-lang="bn" style="display: none;">কয়েন উত্তোলন</h2>
+            <p data-lang="en">Minimum withdrawal amount: To be announced soon!</p>
+            <p data-lang="bn" style="display: none;">ন্যূনতম উত্তোলন পরিমাণ: শীঘ্রই ঘোষণা করা হবে!</p>
             <select id="method">
                 <option value="bKash">bKash</option>
                 <option value="Nagad">Nagad</option>
@@ -595,176 +670,254 @@
             <input type="number" id="amount" placeholder="Enter amount" min="1" onkeypress="restrictToNumbers(event)">
             <input type="text" id="details" placeholder="Enter payment details">
             <p id="withdraw-status"></p>
-            <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
+            <button class="action-button" onclick="withdraw()" data-lang="en">Submit Withdrawal</button>
+            <button class="action-button" onclick="withdraw()" data-lang="bn" style="display: none;">উত্তোলন জমা দিন</button>
         </div>
         <div class="page about-page" id="about">
-            <h2>About LBBD Community</h2>
-            <p>
+            <h2 data-lang="en">About LBBD Community</h2>
+            <h2 data-lang="bn" style="display: none;">LBBD কমিউনিটি সম্পর্কে</h2>
+            <p data-lang="en">
                 LBBD COMMUNITY is pioneering the Tap-2-Earn revolution in Bangladesh, inspired by projects like Hamster Kombat.
                 Our mission is to empower users through innovative, rewarding, and engaging platforms.
                 This referral web app is just the beginning — join us to support our journey and unlock exciting Tap-2-Earn bots and more!
             </p>
-            <p>Join our bot: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
+            <p data-lang="bn" style="display: none;">
+                এলবিবিডি কমিউনিটি বাংলাদেশে ট্যাপ-২-আর্ন বিপ্লবের পথিকৃৎ, হ্যামস্টার কম্ব্যাটের মতো প্রকল্প দ্বারা অনুপ্রাণিত।
+                আমাদের লক্ষ্য হলো উদ্ভাবনী, পুরস্কৃত এবং আকর্ষণীয় প্ল্যাটফর্মের মাধ্যমে ব্যবহারকারীদের ক্ষমতায়ন করা।
+                এই রেফারেল ওয়েব অ্যাপটি কেবল শুরু — আমাদের যাত্রায় সমর্থন করতে এবং আরও উত্তেজনাপূর্ণ ট্যাপ-২-আর্ন বট আনলক করতে আমাদের সাথে যোগ দিন!
+            </p>
+            <p data-lang="en">Join our bot: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
+            <p data-lang="bn" style="display: none;">আমাদের বটে যোগ দিন: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
+            <p data-lang="en">By using this app, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>.</p>
+            <p data-lang="bn" style="display: none;">এই অ্যাপটি ব্যবহার করে, আপনি আমাদের <a href="#terms">সেবার শর্তাবলী</a> এবং <a href="#privacy">গোপনীয়তা নীতি</a> এর সাথে সম্মত হচ্ছেন।</p>
             <div class="notice">
-                <span>Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
+                <span data-lang="en">Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
+                <span data-lang="bn" style="display: none;">হ্যামস্টার কম্ব্যাটের মতো, এলবিবিডি কমিউনিটি @earn_by_lbbd_bot এর সাথে ট্যাপ-২-আর্ন চালু করছে। এখনই যোগ দিন!</span>
             </div>
         </div>
         <div class="page admin-page" id="admin">
-            <h2>Admin Panel</h2>
-            <button onclick="testFirestoreWrite()">Test Firestore Write</button>
+            <h2 data-lang="en">Admin Panel</h2>
+            <h2 data-lang="bn" style="display: none;">অ্যাডমিন প্যানেল</h2>
+            <button onclick="testFirestoreWrite()" data-lang="en">Test Firestore Write</button>
+            <button onclick="testFirestoreWrite()" data-lang="bn" style="display: none;">ফায়ারস্টোর লেখার পরীক্ষা</button>
             <p id="admin-access-message">Welcome, Admin!</p>
             <div class="summary-section">
-                <h3>Dashboard Summary</h3>
-                <p>Total Users: <span id="total-users">0</span></p>
-                <p>Total Coins in Circulation: <span id="total-coins">0</span></p>
-                <p>Pending Withdrawals: <span id="pending-withdrawals">0</span></p>
+                <h3 data-lang="en">Dashboard Summary</h3>
+                <h3 data-lang="bn" style="display: none;">ড্যাশবোর্ড সারাংশ</h3>
+                <p data-lang="en">Total Users: <span id="total-users">0</span></p>
+                <p data-lang="bn" style="display: none;">মোট ব্যবহারকারী: <span id="total-users">০</span></p>
+                <p data-lang="en">Total Coins in Circulation: <span id="total-coins">0</span></p>
+                <p data-lang="bn" style="display: none;">মোট কয়েন প্রচলনে: <span id="total-coins">০</span></p>
+                <p data-lang="en">Pending Withdrawals: <span id="pending-withdrawals">0</span></p>
+                <p data-lang="bn" style="display: none;">মুলতুবি উত্তোলন: <span id="pending-withdrawals">০</span></p>
             </div>
             <div class="admin-section">
-                <h3>User Management</h3>
+                <h3 data-lang="en">User Management</h3>
+                <h3 data-lang="bn" style="display: none;">ব্যবহারকারী ব্যবস্থাপনা</h3>
                 <div class="user-list" id="user-list"></div>
             </div>
             <div class="admin-section">
-                <h3>Withdrawal Requests</h3>
+                <h3 data-lang="en">Withdrawal Requests</h3>
+                <h3 data-lang="bn" style="display: none;">উত্তোলনের অনুরোধ</h3>
                 <div class="withdraw-list" id="withdraw-list"></div>
             </div>
             <div class="admin-section">
-                <h3>Send Notice to All Users</h3>
+                <h3 data-lang="en">Send Notice to All Users</h3>
+                <h3 data-lang="bn" style="display: none;">সকল ব্যবহারকারীকে নোটিশ পাঠান</h3>
                 <div class="notice-form">
                     <input type="text" id="admin-notice" placeholder="Enter notice message">
-                    <button onclick="sendNotice()">Send Notice</button>
+                    <button onclick="sendNotice()" data-lang="en">Send Notice</button>
+                    <button onclick="sendNotice()" data-lang="bn" style="display: none;">নোটিশ পাঠান</button>
                 </div>
                 <p id="notice-status"></p>
             </div>
         </div>
     </div>
     <div class="nav" id="nav">
-        <button id="nav-balance">Balance</button>
-        <button id="nav-invite">Invite</button>
-        <button id="nav-withdraw">Withdraw</button>
-        <button id="nav-about">About</button>
-        <button id="nav-admin">Admin</button>
+        <button id="nav-balance" data-lang="en">Balance</button>
+        <button id="nav-balance" data-lang="bn" style="display: none;">ব্যালেন্স</button>
+        <button id="nav-invite" data-lang="en">Invite</button>
+        <button id="nav-invite" data-lang="bn" style="display: none;">আমন্ত্রণ</button>
+        <button id="nav-withdraw" data-lang="en">Withdraw</button>
+        <button id="nav-withdraw" data-lang="bn" style="display: none;">উত্তোলন</button>
+        <button id="nav-about" data-lang="en">About</button>
+        <button id="nav-about" data-lang="bn" style="display: none;">সম্পর্কে</button>
+        <button id="nav-admin" data-lang="en">Admin</button>
+        <button id="nav-admin" data-lang="bn" style="display: none;">অ্যাডমিন</button>
     </div>
     <div class="popup-overlay" id="admin-popup">
         <div class="popup">
-            <h3>Admin Access</h3>
+            <h3 data-lang="en">Admin Access</h3>
+            <h3 data-lang="bn" style="display: none;">অ্যাডমিন অ্যাক্সেস</h3>
             <input type="password" id="admin-password" placeholder="Enter admin password">
-            <button onclick="checkAdminPassword()">Submit</button>
-            <button onclick="closePopup()">Cancel</button>
-            <p class="error-message" id="admin-error">Incorrect password. Please try again.</p>
+            <button onclick="checkAdminPassword()" data-lang="en">Submit</button>
+            <button onclick="checkAdminPassword()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <button onclick="closePopup()" data-lang="en">Cancel</button>
+            <button onclick="closePopup()" data-lang="bn" style="display: none;">বাতিল</button>
+            <p class="error-message" id="admin-error" data-lang="en">Incorrect password. Please try again.</p>
+            <p class="error-message" id="admin-error-bn" data-lang="bn" style="display: none;">ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।</p>
         </div>
     </div>
     <div class="popup-overlay" id="notice-popup">
         <div class="popup">
-            <h3>Admin Notice</h3>
+            <h3 data-lang="en">Admin Notice</h3>
+            <h3 data-lang="bn" style="display: none;">অ্যাডমিন নোটিশ</h3>
             <p id="notice-message"></p>
-            <button onclick="closeNoticePopup()">Close</button>
+            <button onclick="closeNoticePopup()" data-lang="en">Close</button>
+            <button onclick="closeNoticePopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
         </div>
     </div>
     <div class="popup-overlay" id="ban-confirm-popup">
         <div class="popup">
-            <h3>Confirm Ban</h3>
-            <p>Are you sure you want to ban this user?</p>
-            <button onclick="confirmBan(true)">OK</button>
-            <button onclick="confirmBan(false)">Cancel</button>
+            <h3 data-lang="en">Confirm Ban</h3>
+            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা নিশ্চিত করুন</h3>
+            <p data-lang="en">Are you sure you want to ban this user?</p>
+            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে নিষিদ্ধ করতে চান?</p>
+            <button onclick="confirmBan(true)" data-lang="en">OK</button>
+            <button onclick="confirmBan(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+            <button onclick="confirmBan(false)" data-lang="en">Cancel</button>
+            <button onclick="confirmBan(false)" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="ban-message-popup">
         <div class="popup">
-            <h3>Ban Reason</h3>
-            <p>Type a message explaining why this user is being banned:</p>
+            <h3 data-lang="en">Ban Reason</h3>
+            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞার কারণ</h3>
+            <p data-lang="en">Type a message explaining why this user is being banned:</p>
+            <p data-lang="bn" style="display: none;">এই ব্যবহারকারীকে কেন নিষিদ্ধ করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
             <textarea id="ban-message-input" placeholder="Enter ban reason"></textarea>
-            <button onclick="submitBanMessage()">Submit</button>
+            <button onclick="submitBanMessage()" data-lang="en">Submit</button>
+            <button onclick="submitBanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
         </div>
     </div>
     <div class="popup-overlay" id="unban-confirm-popup">
         <div class="popup">
-            <h3>Confirm Unban</h3>
-            <p>Are you sure you want to unban this user?</p>
-            <button onclick="confirmUnban(true)">OK</button>
-            <button onclick="confirmUnban(false)">Cancel</button>
+            <h3 data-lang="en">Confirm Unban</h3>
+            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা তুলে নেওয়া নিশ্চিত করুন</h3>
+            <p data-lang="en">Are you sure you want to unban this user?</p>
+            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীর নিষেধাজ্ঞা তুলে নিতে চান?</p>
+            <button onclick="confirmUnban(true)" data-lang="en">OK</button>
+            <button onclick="confirmUnban(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+            <button onclick="confirmUnban(false)" data-lang="en">Cancel</button>
+            <button onclick="confirmUnban(false)" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="unban-message-popup">
         <div class="popup">
-            <h3>Unban Message</h3>
-            <p>Type a special message for this user:</p>
+            <h3 data-lang="en">Unban Message</h3>
+            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা তুলে নেওয়ার বার্তা</h3>
+            <p data-lang="en">Type a special message for this user:</p>
+            <p data-lang="bn" style="display: none;">এই ব্যবহারকারীর জন্য একটি বিশেষ বার্তা টাইপ করুন:</p>
             <textarea id="unban-message-input" placeholder="Enter unban message"></textarea>
-            <button onclick="submitUnbanMessage()">Submit</button>
+            <button onclick="submitUnbanMessage()" data-lang="en">Submit</button>
+            <button onclick="submitUnbanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
         </div>
     </div>
     <div class="popup-overlay" id="ban-notification-popup">
         <div class="popup">
-            <h3>You Are Banned</h3>
+            <h3 data-lang="en">You Are Banned</h3>
+            <h3 data-lang="bn" style="display: none;">আপনি নিষিদ্ধ হয়েছেন</h3>
             <p id="ban-notification-message"></p>
-            <button onclick="closeBot()">Cancel</button>
+            <button onclick="closeBot()" data-lang="en">Cancel</button>
+            <button onclick="closeBot()" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="unban-notification-popup">
         <div class="popup">
-            <h3>Congratulations!</h3>
-            <p>You have been unbanned!</p>
+            <h3 data-lang="en">Congratulations!</h3>
+            <h3 data-lang="bn" style="display: none;">অভিনন্দন!</h3>
+            <p data-lang="en">You have been unbanned!</p>
+            <p data-lang="bn" style="display: none;">আপনার নিষেধাজ্ঞা তুলে নেওয়া হয়েছে!</p>
             <p id="unban-notification-message"></p>
-            <button onclick="closeUnbanNotification()">OK</button>
+            <button onclick="closeUnbanNotification()" data-lang="en">OK</button>
+            <button onclick="closeUnbanNotification()" data-lang="bn" style="display: none;">ঠিক আছে</button>
         </div>
     </div>
     <div class="popup-overlay" id="add-coins-popup">
         <div class="popup">
-            <h3>Add Coins</h3>
-            <p>Enter the amount of coins to add:</p>
+            <h3 data-lang="en">Add Coins</h3>
+            <h3 data-lang="bn" style="display: none;">কয়েন যোগ করুন</h3>
+            <p data-lang="en">Enter the amount of coins to add:</p>
+            <p data-lang="bn" style="display: none;">যোগ করার জন্য কয়েনের পরিমাণ লিখুন:</p>
             <input type="number" id="add-coins-input" placeholder="Enter amount" min="1">
-            <button onclick="submitAddCoins()">Submit</button>
-            <button onclick="cancelAction()">Cancel</button>
+            <button onclick="submitAddCoins()" data-lang="en">Submit</button>
+            <button onclick="submitAddCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <button onclick="cancelAction()" data-lang="en">Cancel</button>
+            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="subtract-coins-popup">
         <div class="popup">
-            <h3>Subtract Coins</h3>
-            <p>Enter the amount of coins to subtract:</p>
+            <h3 data-lang="en">Subtract Coins</h3>
+            <h3 data-lang="bn" style="display: none;">কয়েন বিয়োগ করুন</h3>
+            <p data-lang="en">Enter the amount of coins to subtract:</p>
+            <p data-lang="bn" style="display: none;">বিয়োগ করার জন্য কয়েনের পরিমাণ লিখুন:</p>
             <input type="number" id="subtract-coins-input" placeholder="Enter amount" min="1">
-            <button onclick="submitSubtractCoins()">Submit</button>
-            <button onclick="cancelAction()">Cancel</button>
+            <p id="subtract-error" class="error-message" data-lang="en" style="display: none;">Cannot subtract: User has 0 coins.</p>
+            <p id="subtract-error-bn" class="error-message" data-lang="bn" style="display: none;">বিয়োগ করা যাবে না: ব্যবহারকারীর ০ কয়েন আছে।</p>
+            <button onclick="submitSubtractCoins()" data-lang="en">Submit</button>
+            <button onclick="submitSubtractCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <button onclick="cancelAction()" data-lang="en">Cancel</button>
+            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="withdraw-status-popup">
         <div class="popup">
-            <h3>Withdrawal Status</h3>
+            <h3 data-lang="en">Withdrawal Status</h3>
+            <h3 data-lang="bn" style="display: none;">উত্তোলনের অবস্থা</h3>
             <p id="withdraw-status-message"></p>
-            <button onclick="closeWithdrawStatusPopup()">Close</button>
+            <button onclick="closeWithdrawStatusPopup()" data-lang="en">Close</button>
+            <button onclick="closeWithdrawStatusPopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
         </div>
     </div>
     <div class="popup-overlay" id="cancel-reason-popup">
         <div class="popup">
-            <h3>Cancellation Reason</h3>
-            <p>Type a message explaining why this withdrawal is being cancelled:</p>
+            <h3 data-lang="en">Cancellation Reason</h3>
+            <h3 data-lang="bn" style="display: none;">বাতিলের কারণ</h3>
+            <p data-lang="en">Type a message explaining why this withdrawal is being cancelled:</p>
+            <p data-lang="bn" style="display: none;">এই উত্তোলন কেন বাতিল করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
             <textarea id="cancel-reason-input" placeholder="Enter cancellation reason"></textarea>
-            <button onclick="submitCancelReason()">Submit</button>
-            <button onclick="cancelAction()">Cancel</button>
+            <button onclick="submitCancelReason()" data-lang="en">Submit</button>
+            <button onclick="submitCancelReason()" data-lang="bn" style="display: none;">জমা দিন</button>
+            <button onclick="cancelAction()" data-lang="en">Cancel</button>
+            <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <div class="popup-overlay" id="delete-confirm-popup">
         <div class="popup">
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
-            <button onclick="confirmDelete(true)">OK</button>
-            <button onclick="confirmDelete(false)">Cancel</button>
+            <h3 data-lang="en">Confirm Delete</h3>
+            <h3 data-lang="bn" style="display: none;">মুছে ফেলা নিশ্চিত করুন</h3>
+            <p data-lang="en">Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
+            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না এবং সমস্ত ব্যবহারকারীর ডেটা হারিয়ে যাবে।</p>
+            <button onclick="confirmDelete(true)" data-lang="en">OK</button>
+            <button onclick="confirmDelete(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
+            <button onclick="confirmDelete(false)" data-lang="en">Cancel</button>
+            <button onclick="confirmDelete(false)" data-lang="bn" style="display: none;">বাতিল</button>
         </div>
     </div>
     <script>
         let db = null;
-        try {
-            const firebaseConfig = {
-                apiKey: "AIzaSyDdYyNNk7FxUptu40Riumr2ZcftMglPMVk",
-                authDomain: "lbbd-community-658cd.firebaseapp.com",
-                projectId: "lbbd-community-658cd",
-                storageBucket: "lbbd-community-658cd.firebasestorage.app",
-                messagingSenderId: "1036805634476",
-                appId: "1:1036805634476:web:7db1862c7acc8fd7796209"
-            };
-            const app = firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log('Firebase initialized successfully');
-        } catch (error) {
-            console.error('Firebase initialization error:', error);
+        let currentLanguage = 'en';
+
+        async function initializeFirebase() {
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDdYyNNk7FxUptu40Riumr2ZcftMglPMVk",
+                    authDomain: "lbbd-community-658cd.firebaseapp.com",
+                    projectId: "lbbd-community-658cd",
+                    storageBucket: "lbbd-community-658cd.firebasestorage.app",
+                    messagingSenderId: "1036805634476",
+                    appId: "1:1036805634476:web:7db1862c7acc8fd7796209"
+                };
+                const app = firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log('Firebase initialized successfully');
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('admin-access-message').textContent = 'Failed to initialize database. Please try again later.';
+            }
         }
 
         const canvas = document.getElementById('particles');
@@ -929,6 +1082,7 @@
                 document.getElementById('balance-amount').textContent = `${balance} Coins`;
                 document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                document.getElementById('friends-invited-bn').textContent = `আমন্ত্রিত বন্ধুরা: ${friendsInvited}`;
                 await userRef.update({ hasJoinedBot: true });
                 console.log('User data loaded:', userData);
 
@@ -1010,6 +1164,7 @@
                 friendsInvited = updatedInvited.length;
                 document.getElementById('balance-amount').textContent = `${balance} Coins`;
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                document.getElementById('friends-invited-bn').textContent = `আমন্ত্রিত বন্ধুরা: ${friendsInvited}`;
             }
 
             document.getElementById('invite-status').textContent = `You joined via ${referrerData.username || 'a friend'}'s referral! They earned 1 coin.`;
@@ -1033,6 +1188,7 @@
             document.getElementById('admin-popup').style.display = 'flex';
             document.getElementById('admin-password').value = '';
             document.getElementById('admin-error').style.display = 'none';
+            document.getElementById('admin-error-bn').style.display = 'none';
             document.getElementById('admin-password').focus();
         }
 
@@ -1116,20 +1272,6 @@
                 showAdminPopup();
             }
         });
-
-        function checkAdminPassword() {
-            const passwordInput = document.getElementById('admin-password').value;
-            if (passwordInput === adminPassword) {
-                isAdminAuthenticated = true;
-                document.getElementById('admin-popup').style.display = 'none';
-                document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
-                showPage('admin');
-                loadAdminPanel();
-            } else {
-                document.getElementById('admin-error').style.display = 'block';
-                document.getElementById('admin-password').value = '';
-            }
-        }
 
         function shareBot() {
             const referralLink = document.getElementById('referral-link').textContent.replace('Your referral link: ', '');
@@ -1215,7 +1357,6 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
-            // Load Dashboard Summary
             updateDashboardSummary();
 
             const userList = document.getElementById('user-list');
@@ -1270,52 +1411,34 @@
             db.collection('withdraw_requests').onSnapshot((snapshot) => {
                 withdrawList.innerHTML = '';
                 snapshot.forEach(doc => {
-                    const request = doc.data();
+                    const withdraw = doc.data();
                     const withdrawItem = document.createElement('div');
                     withdrawItem.className = 'withdraw-item';
                     withdrawItem.innerHTML = `
-                        <p>Username: ${request.username}</p>
-                        <p>Amount: ${request.amount} Coins</p>
-                        <p>Method: ${request.method}</p>
-                        <p>Details: ${request.details}</p>
-                        <p>Status: ${request.status}</p>
-                        <p>Time: ${request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                        ${request.status === 'Pending' ? `
-                        <select id="withdraw-select-${doc.id}" onchange="updateWithdrawStatus('${doc.id}', this.value)">
+                        <p>Telegram Username: ${withdraw.username || 'Anonymous'}</p>
+                        <p>Telegram ID: ${withdraw.telegramId}</p>
+                        <p>Amount: ${withdraw.amount} coins</p>
+                        <p>Method: ${withdraw.method}</p>
+                        <p>Details: ${withdraw.details}</p>
+                        <p>Status: ${withdraw.status}</p>
+                        <p>Timestamp: ${withdraw.timestamp ? withdraw.timestamp.toDate().toLocaleString() : 'N/A'}</p>
+                        <select id="withdraw-select-${doc.id}" onchange="updateSelectedWithdraw('${doc.id}', this.value)">
                             <option value="">Select Action</option>
-                            <option value="Paid">Mark as Paid</option>
-                            <option value="Cancelled">Mark as Cancelled</option>
+                            <option value="pay">Pay</option>
+                            <option value="cancel">Cancel</option>
                         </select>
-                        ` : ''}
                     `;
                     withdrawList.appendChild(withdrawItem);
                 });
-                updateDashboardSummary();
             }, (error) => {
-                console.error('Error loading withdrawal requests:', error);
+                console.error('Error loading withdrawals:', error);
+                document.getElementById('admin-access-message').textContent = 'Error loading withdrawals: ' + error.message;
             });
-        }
-
-        async function updateDashboardSummary() {
-            if (!db) return;
-            const usersSnapshot = await db.collection('users').get();
-            const totalUsers = usersSnapshot.size;
-            let totalCoins = 0;
-            usersSnapshot.forEach(doc => {
-                totalCoins += doc.data().coins || 0;
-            });
-            const withdrawSnapshot = await db.collection('withdraw_requests').where('status', '==', 'Pending').get();
-            const pendingWithdrawals = withdrawSnapshot.size;
-
-            document.getElementById('total-users').textContent = totalUsers;
-            document.getElementById('total-coins').textContent = totalCoins;
-            document.getElementById('pending-withdrawals').textContent = pendingWithdrawals;
         }
 
         function updateSelectedUser(userId, action) {
             selectedUserId = userId;
             selectedAction = action;
-            const select = document.getElementById(`user-select-${userId}`);
             if (action === 'ban') {
                 document.getElementById('ban-confirm-popup').style.display = 'flex';
             } else if (action === 'unban') {
@@ -1325,276 +1448,324 @@
                 document.getElementById('add-coins-popup').style.display = 'flex';
             } else if (action === 'subtractCoins') {
                 document.getElementById('subtract-coins-input').value = '';
+                document.getElementById('subtract-error').style.display = 'none';
+                document.getElementById('subtract-error-bn').style.display = 'none';
                 document.getElementById('subtract-coins-popup').style.display = 'flex';
             } else if (action === 'delete') {
                 document.getElementById('delete-confirm-popup').style.display = 'flex';
             }
-            select.value = '';
         }
 
-        async function confirmDelete(confirmed) {
-            document.getElementById('delete-confirm-popup').style.display = 'none';
-            if (confirmed) {
-                await deleteUser(selectedUserId);
-            }
-            selectedUserId = null;
-            selectedAction = null;
-        }
-
-        async function deleteUser(userId) {
-            if (!db || !userId) return;
-
-            // Delete the user from the users collection
-            const userRef = db.collection('users').doc(userId);
-            const userDoc = await userRef.get();
-            const userData = userDoc.data();
-
-            // Remove the user from any referrer's invitedUsers list
-            if (userData.invitedBy) {
-                const referrerRef = db.collection('users').doc(userData.invitedBy);
-                const referrerDoc = await referrerRef.get();
-                if (referrerDoc.exists) {
-                    const referrerData = referrerDoc.data();
-                    const updatedInvitedUsers = (referrerData.invitedUsers || []).filter(id => id !== userId);
-                    await referrerRef.update({ invitedUsers: updatedInvitedUsers });
-                }
-            }
-
-            // Delete any withdrawal requests associated with the user
-            const withdrawRequests = await db.collection('withdraw_requests')
-                .where('telegramId', '==', userData.telegramId)
-                .get();
-            const batch = db.batch();
-            withdrawRequests.forEach(doc => {
-                batch.delete(doc.ref);
-            });
-            await batch.commit();
-
-            // Delete the user document
-            await userRef.delete();
-            document.getElementById('admin-access-message').textContent = `User ${userData.username || 'Unknown'} deleted successfully!`;
-            updateDashboardSummary();
-        }
-
-        function confirmBan(confirmed) {
+        function confirmBan(confirm) {
             document.getElementById('ban-confirm-popup').style.display = 'none';
-            if (confirmed) {
+            if (confirm) {
                 document.getElementById('ban-message-input').value = '';
                 document.getElementById('ban-message-popup').style.display = 'flex';
             } else {
-                selectedUserId = null;
-                selectedAction = null;
+                resetUserSelect();
             }
         }
 
         async function submitBanMessage() {
-            if (!db || !selectedUserId) return;
-            const message = document.getElementById('ban-message-input').value;
-            if (!message) {
-                alert('Please enter a ban reason.');
-                return;
-            }
+            const banMessage = document.getElementById('ban-message-input').value.trim();
+            if (!selectedUserId || !db) return;
+
             const userRef = db.collection('users').doc(selectedUserId);
             await userRef.update({
                 isBanned: true,
-                banMessage: message,
-                unbanMessage: '',
-                shownUnbanMessage: false
+                banMessage: banMessage || 'No reason provided.'
             });
             document.getElementById('ban-message-popup').style.display = 'none';
-            selectedUserId = null;
-            selectedAction = null;
+            resetUserSelect();
         }
 
-        function confirmUnban(confirmed) {
+        function confirmUnban(confirm) {
             document.getElementById('unban-confirm-popup').style.display = 'none';
-            if (confirmed) {
+            if (confirm) {
                 document.getElementById('unban-message-input').value = '';
                 document.getElementById('unban-message-popup').style.display = 'flex';
             } else {
-                selectedUserId = null;
-                selectedAction = null;
+                resetUserSelect();
             }
         }
 
         async function submitUnbanMessage() {
-            if (!db || !selectedUserId) return;
-            const message = document.getElementById('unban-message-input').value;
-            if (!message) {
-                alert('Please enter an unban message.');
-                return;
-            }
+            const unbanMessage = document.getElementById('unban-message-input').value.trim();
+            if (!selectedUserId || !db) return;
+
             const userRef = db.collection('users').doc(selectedUserId);
             await userRef.update({
                 isBanned: false,
                 banMessage: '',
-                unbanMessage: message,
+                unbanMessage: unbanMessage || 'Welcome back!',
                 shownUnbanMessage: false
             });
             document.getElementById('unban-message-popup').style.display = 'none';
-            selectedUserId = null;
-            selectedAction = null;
+            resetUserSelect();
         }
 
         async function submitAddCoins() {
-            if (!db || !selectedUserId) return;
             const amount = parseInt(document.getElementById('add-coins-input').value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid positive number.');
+            if (!selectedUserId || !db || isNaN(amount) || amount <= 0) {
+                document.getElementById('add-coins-popup').style.display = 'none';
+                resetUserSelect();
                 return;
             }
+
             const userRef = db.collection('users').doc(selectedUserId);
-            await userRef.update({
-                coins: firebase.firestore.FieldValue.increment(amount)
-            });
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            const newCoins = (userData.coins || 0) + amount;
+            await userRef.update({ coins: newCoins });
+            updateLiveCoins(selectedUserId, newCoins);
             document.getElementById('add-coins-popup').style.display = 'none';
+            resetUserSelect();
+        }
+
+        async function submitSubtractCoins() {
+            const amount = parseInt(document.getElementById('subtract-coins-input').value);
+            if (!selectedUserId || !db || isNaN(amount) || amount <= 0) {
+                document.getElementById('subtract-coins-popup').style.display = 'none';
+                resetUserSelect();
+                return;
+            }
+
+            const userRef = db.collection('users').doc(selectedUserId);
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            const currentCoins = userData.coins || 0;
+
+            if (currentCoins === 0 || amount > currentCoins) {
+                document.getElementById('subtract-error').style.display = currentLanguage === 'en' ? 'block' : 'none';
+                document.getElementById('subtract-error-bn').style.display = currentLanguage === 'bn' ? 'block' : 'none';
+                return;
+            }
+
+            const newCoins = currentCoins - amount;
+            await userRef.update({ coins: newCoins });
+            updateLiveCoins(selectedUserId, newCoins);
+            document.getElementById('subtract-coins-popup').style.display = 'none';
+            resetUserSelect();
+        }
+
+        function confirmDelete(confirm) {
+            document.getElementById('delete-confirm-popup').style.display = 'none';
+            if (confirm) {
+                deleteUser();
+            } else {
+                resetUserSelect();
+            }
+        }
+
+        async function deleteUser() {
+            if (!selectedUserId || !db) return;
+            const userRef = db.collection('users').doc(selectedUserId);
+            await userRef.delete();
+            console.log(`User ${selectedUserId} deleted successfully.`);
+            resetUserSelect();
+        }
+
+        function updateLiveCoins(userId, coins) {
+            const coinElement = document.getElementById(`coin-${userId}`);
+            if (coinElement) {
+                coinElement.textContent = coins;
+            }
+        }
+
+        function resetUserSelect() {
+            if (selectedUserId) {
+                const select = document.getElementById(`user-select-${selectedUserId}`);
+                if (select) select.value = '';
+            }
             selectedUserId = null;
             selectedAction = null;
         }
 
-        async function submitSubtractCoins() {
-            if (!db || !selectedUserId) return;
-            const amount = parseInt(document.getElementById('subtract-coins-input').value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid positive number.');
-                return;
+        function updateSelectedWithdraw(withdrawId, action) {
+            selectedWithdrawId = withdrawId;
+            if (action === 'pay') {
+                updateWithdrawStatus('Paid');
+            } else if (action === 'cancel') {
+                document.getElementById('cancel-reason-input').value = '';
+                document.getElementById('cancel-reason-popup').style.display = 'flex';
             }
-            const userRef = db.collection('users').doc(selectedUserId);
-            await userRef.update({
-                coins: firebase.firestore.FieldValue.increment(-amount)
+        }
+
+        async function updateWithdrawStatus(status) {
+            if (!selectedWithdrawId || !db) return;
+            const withdrawRef = db.collection('withdraw_requests').doc(selectedWithdrawId);
+            const withdrawDoc = await withdrawRef.get();
+            const withdrawData = withdrawDoc.data();
+            await withdrawRef.update({ status });
+
+            const userRef = db.collection('users').doc(withdrawData.telegramId.toString());
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            const updatedHistory = userData.withdrawalHistory.map(w => {
+                if (w.timestamp === withdrawData.timestamp.toDate().toISOString()) {
+                    return { ...w, status };
+                }
+                return w;
             });
-            document.getElementById('subtract-coins-popup').style.display = 'none';
-            selectedUserId = null;
-            selectedAction = null;
+            await userRef.update({ withdrawalHistory: updatedHistory });
+            selectedWithdrawId = null;
+        }
+
+        async function submitCancelReason() {
+            const cancelReason = document.getElementById('cancel-reason-input').value.trim();
+            if (!selectedWithdrawId || !db) return;
+
+            const withdrawRef = db.collection('withdraw_requests').doc(selectedWithdrawId);
+            const withdrawDoc = await withdrawRef.get();
+            const withdrawData = withdrawDoc.data();
+            await withdrawRef.update({ status: 'Cancelled' });
+
+            const userRef = db.collection('users').doc(withdrawData.telegramId.toString());
+            const userDoc = await userRef.get();
+            const userData = userDoc.data();
+            const updatedHistory = userData.withdrawalHistory.map(w => {
+                if (w.timestamp === withdrawData.timestamp.toDate().toISOString()) {
+                    return { ...w, status: 'Cancelled', cancelReason: cancelReason || 'No reason provided.' };
+                }
+                return w;
+            });
+
+            const newCoins = (userData.coins || 0) + withdrawData.amount;
+            await userRef.update({
+                coins: newCoins,
+                withdrawalHistory: updatedHistory
+            });
+
+            document.getElementById('cancel-reason-popup').style.display = 'none';
+            selectedWithdrawId = null;
         }
 
         function cancelAction() {
             document.getElementById('add-coins-popup').style.display = 'none';
             document.getElementById('subtract-coins-popup').style.display = 'none';
             document.getElementById('cancel-reason-popup').style.display = 'none';
-            selectedUserId = null;
-            selectedAction = null;
-            selectedWithdrawId = null;
+            resetUserSelect();
         }
 
-        async function updateWithdrawStatus(requestId, status) {
-            selectedWithdrawId = requestId;
-            if (status === 'Paid') {
-                await handleWithdrawStatus(requestId, 'Paid');
-            } else if (status === 'Cancelled') {
-                document.getElementById('cancel-reason-input').value = '';
-                document.getElementById('cancel-reason-popup').style.display = 'flex';
-            }
-            document.getElementById(`withdraw-select-${requestId}`).value = '';
-        }
-
-        async function submitCancelReason() {
-            if (!db || !selectedWithdrawId) return;
-            const reason = document.getElementById('cancel-reason-input').value;
-            if (!reason) {
-                alert('Please enter a cancellation reason.');
-                return;
-            }
-            await handleWithdrawStatus(selectedWithdrawId, 'Cancelled', reason);
-            document.getElementById('cancel-reason-popup').style.display = 'none';
-            selectedWithdrawId = null;
-        }
-
-        async function handleWithdrawStatus(requestId, status, cancelReason = '') {
+        async function updateDashboardSummary() {
             if (!db) return;
+            const usersSnapshot = await db.collection('users').get();
+            const withdrawSnapshot = await db.collection('withdraw_requests').get();
 
-            const requestRef = db.collection('withdraw_requests').doc(requestId);
-            const request = (await requestRef.get()).data();
-            await requestRef.update({ status });
+            let totalUsers = usersSnapshot.size;
+            let totalCoins = 0;
+            let pendingWithdrawals = 0;
 
-            const userRef = db.collection('users').doc(request.telegramId.toString());
-            const user = (await userRef.get()).data();
-            const updatedHistory = user.withdrawalHistory.map(w => 
-                w.timestamp === request.timestamp.toDate().toISOString() ? { ...w, status, cancelReason } : w
-            );
-            await userRef.update({
-                withdrawalHistory: updatedHistory,
-                shownWithdrawStatuses: user.shownWithdrawStatuses || []
+            usersSnapshot.forEach(doc => {
+                const user = doc.data();
+                totalCoins += user.coins || 0;
             });
+
+            withdrawSnapshot.forEach(doc => {
+                const withdraw = doc.data();
+                if (withdraw.status === 'Pending') {
+                    pendingWithdrawals++;
+                }
+            });
+
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('total-coins').textContent = totalCoins;
+            document.getElementById('pending-withdrawals').textContent = pendingWithdrawals;
         }
 
         async function sendNotice() {
-            if (!db) {
-                document.getElementById('admin-access-message').textContent = 'Database not initialized.';
+            if (!isAdminAuthenticated || !db) {
+                document.getElementById('notice-status').textContent = 'Access denied: Admin only.';
                 return;
             }
-            const notice = document.getElementById('admin-notice').value;
-            if (notice) {
-                const usersSnapshot = await db.collection('users').get();
-                usersSnapshot.forEach(doc => {
-                    db.collection('users').doc(doc.id).update({
-                        notices: firebase.firestore.FieldValue.arrayUnion({
-                            message: notice,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        })
-                    });
-                });
-                document.getElementById('admin-notice').value = '';
-                document.getElementById('notice-status').textContent = 'Notice sent to all users!';
-            } else {
+            const noticeMessage = document.getElementById('admin-notice').value.trim();
+            if (!noticeMessage) {
                 document.getElementById('notice-status').textContent = 'Please enter a notice message.';
+                return;
             }
-        }
 
-        function updateLiveCoins(userId, initialCoins) {
-            const coinElement = document.getElementById(`coin-${userId}`);
-            if (!coinElement) return;
-            let coins = initialCoins;
-            setInterval(async () => {
-                if (db) {
-                    const userDoc = await db.collection('users').doc(userId).get();
-                    coins = userDoc.data().coins || coins;
-                    coinElement.textContent = coins;
-                }
-            }, 5000);
+            const usersSnapshot = await db.collection('users').get();
+            const batch = db.batch();
+            usersSnapshot.forEach(doc => {
+                const userRef = db.collection('users').doc(doc.id);
+                batch.update(userRef, {
+                    notices: firebase.firestore.FieldValue.arrayUnion({
+                        message: noticeMessage,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    })
+                });
+            });
+
+            await batch.commit();
+            document.getElementById('notice-status').textContent = 'Notice sent to all users!';
+            document.getElementById('admin-notice').value = '';
         }
 
         async function testFirestoreWrite() {
             if (!db) {
-                console.error('Firestore not initialized.');
-                document.getElementById('admin-access-message').textContent = 'Firestore not initialized.';
+                document.getElementById('admin-access-message').textContent = 'Database not initialized.';
                 return;
             }
-            testUserCounter++;
-            const testId = `test${testUserCounter}`;
-            const username = `TestUser${testUserCounter}`;
-            db.collection('users').doc(testId).set({
-                telegramId: testId,
-                username: username,
-                coins: 0,
-                referralLink: `https://lbbduser.github.io/lbbd-mini-app/?ref=${testId}`,
-                invitedUsers: [],
-                isBanned: false,
-                banMessage: '',
-                unbanMessage: '',
-                shownUnbanMessage: false,
-                withdrawalHistory: [],
-                notices: [],
-                shownNotices: [],
-                shownWithdrawStatuses: [],
-                hasJoinedBot: true,
-                referralEvents: [],
-                joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                console.log('Test user added successfully:', testId);
-                document.getElementById('admin-access-message').textContent = `Test user ${username} added successfully!`;
+            const testUserId = `testUser_${testUserCounter++}`;
+            const testUserRef = db.collection('users').doc(testUserId);
+            try {
+                await testUserRef.set({
+                    telegramId: testUserId,
+                    username: `TestUser_${testUserCounter}`,
+                    coins: 0,
+                    referralLink: `${baseReferralUrl}test${testUserCounter}`,
+                    invitedUsers: [],
+                    isBanned: false,
+                    banMessage: '',
+                    unbanMessage: '',
+                    shownUnbanMessage: false,
+                    withdrawalHistory: [],
+                    notices: [],
+                    shownNotices: [],
+                    hasJoinedBot: true,
+                    referralEvents: [],
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('admin-access-message').textContent = `Test user ${testUserId} created successfully!`;
+            } catch (error) {
+                console.error('Error writing test user:', error);
+                document.getElementById('admin-access-message').textContent = 'Error writing test user: ' + error.message;
+            }
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('admin-password').value;
+            if (password === adminPassword) {
+                isAdminAuthenticated = true;
+                document.getElementById('admin-popup').style.display = 'none';
+                showPage('admin');
                 loadAdminPanel();
-            }).catch(error => {
-                console.error('Error adding test user:', error);
-                document.getElementById('admin-access-message').textContent = 'Error adding test user: ' + error.message;
+                document.getElementById('nav').classList.add('admin-active');
+            } else {
+                document.getElementById('admin-error').style.display = currentLanguage === 'en' ? 'block' : 'none';
+                document.getElementById('admin-error-bn').style.display = currentLanguage === 'bn' ? 'block' : 'none';
+            }
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-lang]').forEach(elem => {
+                if (elem.getAttribute('data-lang') === lang) {
+                    elem.style.display = 'block';
+                } else {
+                    elem.style.display = 'none';
+                }
             });
         }
 
-        setTimeout(() => {
-            document.getElementById('splash').remove();
+        document.addEventListener('DOMContentLoaded', () => {
             showPage('balance');
-            initTelegram();
-        }, 4000);
+            changeLanguage('en');
+            initializeFirebase();
+            if (!initTelegram()) {
+                document.getElementById('admin-access-message').textContent = 'Please open this app in Telegram.';
+            }
+        });
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
