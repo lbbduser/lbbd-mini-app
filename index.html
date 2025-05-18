@@ -579,6 +579,7 @@
         </div>
         <div class="page admin-page" id="admin">
             <h2>Admin Panel</h2>
+            <button onclick="testFirestoreWrite()">Test Firestore Write</button>
             <p id="admin-access-message">Welcome, Admin!</p>
             <div class="admin-section">
                 <h3>User Management</h3>
@@ -612,6 +613,13 @@
             <button onclick="checkAdminPassword()">Submit</button>
             <button onclick="closePopup()">Cancel</button>
             <p class="error-message" id="admin-error">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+    <div class="popup-overlay" id="notice-popup">
+        <div class="popup">
+            <h3>Admin Notice</h3>
+            <p id="notice-message"></p>
+            <button onclick="closeNoticePopup()">Close</button>
         </div>
     </div>
     <script>
@@ -690,6 +698,7 @@
         function initTelegram() {
             const isTelegram = window.Telegram && window.Telegram.WebApp;
             if (!isTelegram) {
+                console.error('Telegram WebApp not detected.');
                 document.getElementById('admin-access-message').textContent = 'Please use this app within Telegram.';
                 return false;
             }
@@ -698,17 +707,20 @@
             Telegram.ready();
             Telegram.expand();
             Telegram.enableClosingConfirmation();
+            console.log('Telegram WebApp initialized:', Telegram);
 
             let attempts = 0;
             const maxAttempts = 10;
             const checkInterval = setInterval(() => {
                 currentUser = Telegram.initDataUnsafe.user;
+                console.log('Checking for Telegram user, attempt:', attempts + 1, 'User:', currentUser);
                 if (currentUser && currentUser.id) {
                     document.getElementById('admin-access-message').textContent = `Welcome! Your Telegram ID: ${currentUser.id}`;
                     clearInterval(checkInterval);
                     initializeUser();
                     checkReferral();
                 } else if (attempts >= maxAttempts) {
+                    console.error('Failed to detect Telegram user after', maxAttempts, 'attempts.');
                     document.getElementById('admin-access-message').textContent = 'Unable to detect Telegram user ID after multiple attempts. Please reload the app.';
                     clearInterval(checkInterval);
                 }
@@ -723,36 +735,48 @@
 
         async function initializeUser() {
             if (!currentUser || !db) {
+                console.error('User or DB not initialized:', { currentUser, db });
                 document.getElementById('admin-access-message').textContent = 'Database not initialized. Please try again later.';
                 return;
             }
+            console.log('Initializing user with ID:', currentUser.id);
             const userRef = db.collection('users').doc(currentUser.id.toString());
-            const userDoc = await userRef.get();
-            if (!userDoc.exists) {
-                const referralCode = generateReferralCode(currentUser.id.toString());
-                await userRef.set({
-                    telegramId: currentUser.id,
-                    username: currentUser.username || 'Anonymous',
-                    coins: 0,
-                    referralLink: `${baseReferralUrl}${referralCode}`,
-                    invitedUsers: [],
-                    isBanned: false,
-                    withdrawalHistory: [],
-                    notices: [],
-                    hasJoinedBot: false,
-                    referralEvents: [],
-                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-            const userData = (await userRef.get()).data();
-            balance = userData.coins || 0;
-            friendsInvited = userData.invitedUsers ? userData.invitedUsers.length : 0;
-            document.getElementById('balance-amount').textContent = `${balance} Coins`;
-            document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
-            document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+            try {
+                const userDoc = await userRef.get();
+                if (!userDoc.exists) {
+                    const referralCode = generateReferralCode(currentUser.id.toString());
+                    await userRef.set({
+                        telegramId: currentUser.id,
+                        username: currentUser.username || 'Anonymous',
+                        coins: 0,
+                        referralLink: `${baseReferralUrl}${referralCode}`,
+                        invitedUsers: [],
+                        isBanned: false,
+                        withdrawalHistory: [],
+                        notices: [],
+                        shownNotices: [],
+                        hasJoinedBot: false,
+                        referralEvents: [],
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log('User successfully initialized:', currentUser.id);
+                } else {
+                    console.log('User already exists:', currentUser.id);
+                }
+                const userData = (await userRef.get()).data();
+                balance = userData.coins || 0;
+                friendsInvited = userData.invitedUsers ? userData.invitedUsers.length : 0;
+                document.getElementById('balance-amount').textContent = `${balance} Coins`;
+                document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
+                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+                await userRef.update({ hasJoinedBot: true });
+                console.log('User data loaded:', userData);
 
-            // Mark user as having joined the bot
-            await userRef.update({ hasJoinedBot: true });
+                await checkForNotices();
+            } catch (error) {
+                console.error('Error initializing user:', error);
+                document.getElementById('admin-access-message').textContent = 'Error initializing user: ' + error.message;
+            }
         }
 
         async function checkReferral() {
@@ -797,13 +821,11 @@
                 return;
             }
 
-            // Check if the user has joined the bot
             if (!userData.hasJoinedBot) {
                 document.getElementById('invite-status').textContent = 'Please join @earn_by_lbbd_bot to complete the referral.';
                 return;
             }
 
-            // Update referrer's data
             const updatedInvited = [...new Set([...(referrerData.invitedUsers || []), currentUser.id])];
             const referralEvent = {
                 referredUserId: currentUser.id,
@@ -818,12 +840,10 @@
                 referralEvents: firebase.firestore.FieldValue.arrayUnion(referralEvent)
             });
 
-            // Update the new user's data
             await userRef.update({
                 invitedBy: referrerId
             });
 
-            // Update UI for the referrer if they are the current user
             if (referrerId === currentUser.id.toString()) {
                 balance = (referrerData.coins || 0) + 1;
                 friendsInvited = updatedInvited.length;
@@ -831,7 +851,6 @@
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
             }
 
-            // Notify both users
             document.getElementById('invite-status').textContent = `You joined via ${referrerData.username || 'a friend'}'s referral! They earned 1 coin.`;
             await referrerRef.update({
                 notices: firebase.firestore.FieldValue.arrayUnion({
@@ -859,6 +878,40 @@
         function closePopup() {
             document.getElementById('admin-popup').style.display = 'none';
             showPage('balance');
+        }
+
+        async function checkForNotices() {
+            if (!currentUser || !db) {
+                console.error('Cannot check notices: User or DB not initialized.');
+                return;
+            }
+            console.log('Checking for notices for user:', currentUser.id);
+            const userRef = db.collection('users').doc(currentUser.id.toString());
+            try {
+                const userDoc = await userRef.get();
+                const userData = userDoc.data();
+                const notices = userData.notices || [];
+                const shownNotices = userData.shownNotices || [];
+                console.log('Notices:', notices, 'Shown Notices:', shownNotices);
+
+                const newNotice = notices.find(notice => !shownNotices.includes(notice.timestamp?.toDate().toISOString()));
+                if (newNotice) {
+                    console.log('Displaying new notice:', newNotice);
+                    document.getElementById('notice-message').textContent = newNotice.message;
+                    document.getElementById('notice-popup').style.display = 'flex';
+                    await userRef.update({
+                        shownNotices: firebase.firestore.FieldValue.arrayUnion(newNotice.timestamp.toDate().toISOString())
+                    });
+                } else {
+                    console.log('No new notices to display.');
+                }
+            } catch (error) {
+                console.error('Error checking notices:', error);
+            }
+        }
+
+        function closeNoticePopup() {
+            document.getElementById('notice-popup').style.display = 'none';
         }
 
         document.getElementById('nav-balance').addEventListener('click', () => showPage('balance'));
@@ -970,13 +1023,18 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
-            // Load User Management Section with Real-Time Updates
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
             db.collection('users').onSnapshot(async (snapshot) => {
+                if (snapshot.empty) {
+                    userList.innerHTML = '<p>No users found.</p>';
+                    console.log('No users in database.');
+                    return;
+                }
                 userList.innerHTML = '';
                 for (const doc of snapshot.docs) {
                     const user = doc.data();
+                    console.log('User loaded:', user);
                     const invitedUsernames = [];
                     for (const id of user.invitedUsers || []) {
                         const invitedUserDoc = await db.collection('users').doc(id.toString()).get();
@@ -1007,10 +1065,9 @@
                 }
             }, (error) => {
                 console.error('Error loading users:', error);
-                document.getElementById('admin-access-message').textContent = 'Error loading users. Please try again.';
+                document.getElementById('admin-access-message').textContent = 'Error loading users: ' + error.message;
             });
 
-            // Load Withdrawal Requests Section with Real-Time Updates
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
             db.collection('withdraw_requests').onSnapshot((snapshot) => {
@@ -1047,7 +1104,7 @@
             const action = select.value;
             if (action) {
                 handleUserAction(action);
-                select.value = ""; // Reset dropdown
+                select.value = "";
             }
         }
 
@@ -1119,6 +1176,34 @@
                     coinElement.textContent = coins;
                 }
             }, 5000);
+        }
+
+        function testFirestoreWrite() {
+            if (!db) {
+                console.error('Firestore not initialized.');
+                document.getElementById('admin-access-message').textContent = 'Firestore not initialized.';
+                return;
+            }
+            db.collection('users').doc('test123').set({
+                telegramId: 'test123',
+                username: 'TestUser',
+                coins: 0,
+                referralLink: 'https://lbbduser.github.io/lbbd-mini-app/?ref=test123',
+                invitedUsers: [],
+                isBanned: false,
+                withdrawalHistory: [],
+                notices: [],
+                shownNotices: [],
+                hasJoinedBot: true,
+                referralEvents: [],
+                joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                console.log('Test user added successfully.');
+                document.getElementById('admin-access-message').textContent = 'Test user added successfully!';
+            }).catch(error => {
+                console.error('Error adding test user:', error);
+                document.getElementById('admin-access-message').textContent = 'Error adding test user: ' + error.message;
+            });
         }
 
         setTimeout(() => {
