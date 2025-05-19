@@ -305,19 +305,6 @@
             z-index: 100;
         }
 
-        .nav button {
-            flex: 1;
-            margin: 0 clamp(0.1rem, 0.3vw, 0.2rem);
-            padding: clamp(0.5rem, 1vw, 0.8rem);
-            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-            text-align: center;
-            white-space: nowrap;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            line-height: 1;
-        }
-
         .nav.admin-active button {
             flex: 0.8;
             font-size: clamp(0.6rem, 1vw, 0.75rem);
@@ -506,7 +493,7 @@
             width: 90%;
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2 Zing);
             text-align: center;
             animation: popupFadeIn 0.3s ease-in-out;
             display: flex;
@@ -656,6 +643,7 @@
             <h2>Your Balance</h2>
             <p id="balance-amount">0 Coins</p>
             <p>Current coin value: To be announced soon!</p>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
         <div class="page invite-page" id="invite">
             <h2>Invite</h2>
@@ -664,6 +652,7 @@
             <p id="friends-invited">Friends Invited: 0</p>
             <p id="invite-status"></p>
             <button class="action-button" onclick="shareBot()">Share @earn_by_lbbd_bot</button>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
         <div class="page withdraw-page" id="withdraw">
             <h2>Withdraw Coins</h2>
@@ -678,6 +667,7 @@
             <input type="text" id="details" placeholder="Enter payment details">
             <p id="withdraw-status"></p>
             <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
         <div class="page about-page" id="about">
             <h2>About LBBD Community</h2>
@@ -691,6 +681,7 @@
             <div class="notice">
                 <span>Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
             </div>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
         <div class="page profile-page" id="profile">
             <h2>Your Profile</h2>
@@ -700,6 +691,7 @@
             <p id="profile-referral">Referral Link: Loading...</p>
             <h3>Coin Transaction History</h3>
             <div id="transaction-history" class="transaction-history"></div>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
         <div class="page admin-page" id="admin">
             <h2>Admin Panel</h2>
@@ -727,6 +719,7 @@
                 </div>
                 <p id="notice-status"></p>
             </div>
+            <button class="action-button" onclick="refreshData()">Refresh</button>
         </div>
     </div>
     <div class="nav" id="nav">
@@ -957,6 +950,7 @@
             if (!isTelegram) {
                 console.error('Telegram WebApp not detected.');
                 document.getElementById('admin-access-message').textContent = 'Please use this app within Telegram.';
+                document.getElementById('loading').style.display = 'none';
                 return false;
             }
 
@@ -977,10 +971,12 @@
                     initializeUser();
                     checkReferral();
                     checkBanStatus();
+                    document.getElementById('loading').style.display = 'none';
                 } else if (attempts >= maxAttempts) {
                     console.error('Failed to detect Telegram user after', maxAttempts, 'attempts.');
                     document.getElementById('admin-access-message').textContent = 'Unable to detect Telegram user ID after multiple attempts. Please reload the app.';
                     clearInterval(checkInterval);
+                    document.getElementById('loading').style.display = 'none';
                 }
                 attempts++;
             }, 500);
@@ -1020,6 +1016,7 @@
             if (!currentUser || !db) {
                 console.error('User or DB not initialized:', { currentUser, db });
                 document.getElementById('admin-access-message').textContent = 'Database not initialized. Please try again later.';
+                document.getElementById('loading').style.display = 'none';
                 return;
             }
             console.log('Initializing user with ID:', currentUser.id);
@@ -1043,6 +1040,7 @@
                         shownNotices: [],
                         hasJoinedBot: false,
                         referralEvents: [],
+                        transactionHistory: [],
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     console.log('User successfully initialized:', currentUser.id);
@@ -1064,6 +1062,8 @@
             } catch (error) {
                 console.error('Error initializing user:', error);
                 document.getElementById('admin-access-message').textContent = 'Error initializing user: ' + error.message;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
 
@@ -1331,56 +1331,52 @@
             }
             document.getElementById('admin-access-message').textContent = 'Welcome, Admin!';
 
-            updateDashboardSummary();
+            await updateDashboardSummary();
 
             const userList = document.getElementById('user-list');
             userList.innerHTML = '';
-            db.collection('users').onSnapshot(snapshot => {
-                userList.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const user = doc.data();
-                    const userId = doc.id;
-                    const userItem = document.createElement('div');
-                    userItem.className = 'user-item';
-                    userItem.innerHTML = `
-                        <p>ID: ${userId} | Username: ${user.username || 'Anonymous'}</p>
-                        <p>Coins: <span id="coin-${userId}">${user.coins || 0}</span> | Banned: ${user.isBanned ? 'Yes' : 'No'}</p>
-                        <select id="user-select-${userId}" onchange="updateSelectedUser('${userId}', this.value)">
-                            <option value="">Select Action</option>
-                            <option value="ban">${user.isBanned ? 'Update Ban Reason' : 'Ban'}</option>
-                            <option value="unban">${user.isBanned ? 'Unban' : '---'}</option>
-                            <option value="addCoins">Add Coins</option>
-                            <option value="subtractCoins">Subtract Coins</option>
-                            <option value="delete">Delete User</option>
-                        </select>
-                    `;
-                    userList.appendChild(userItem);
-                });
+            const usersSnapshot = await db.collection('users').get();
+            usersSnapshot.forEach(doc => {
+                const user = doc.data();
+                const userId = doc.id;
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <p>ID: ${userId} | Username: ${user.username || 'Anonymous'}</p>
+                    <p>Coins: <span id="coin-${userId}">${user.coins || 0}</span> | Banned: ${user.isBanned ? 'Yes' : 'No'}</p>
+                    <select id="user-select-${userId}" onchange="updateSelectedUser('${userId}', this.value)">
+                        <option value="">Select Action</option>
+                        <option value="ban">${user.isBanned ? 'Update Ban Reason' : 'Ban'}</option>
+                        <option value="unban">${user.isBanned ? 'Unban' : '---'}</option>
+                        <option value="addCoins">Add Coins</option>
+                        <option value="subtractCoins">Subtract Coins</option>
+                        <option value="delete">Delete User</option>
+                    </select>
+                `;
+                userList.appendChild(userItem);
             });
 
             const withdrawList = document.getElementById('withdraw-list');
             withdrawList.innerHTML = '';
-            db.collection('withdraw_requests').onSnapshot(snapshot => {
-                withdrawList.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const withdraw = doc.data();
-                    const withdrawId = doc.id;
-                    const withdrawItem = document.createElement('div');
-                    withdrawItem.className = 'withdraw-item';
-                    withdrawItem.innerHTML = `
-                        <p>ID: ${withdrawId} | User: ${withdraw.username || 'Anonymous'} (${withdraw.telegramId})</p>
-                        <p>Amount: ${withdraw.amount} | Method: ${withdraw.method} | Details: ${withdraw.details}</p>
-                        <p>Status: ${withdraw.status} | Requested: ${withdraw.timestamp.toDate().toLocaleString()}</p>
-                        ${withdraw.status === 'Pending' ? `
-                            <select onchange="updateSelectedWithdraw('${withdrawId}', this.value)">
-                                <option value="">Select Action</option>
-                                <option value="pay">Pay</option>
-                                <option value="cancel">Cancel</option>
-                            </select>
-                        ` : ''}
-                    `;
-                    withdrawList.appendChild(withdrawItem);
-                });
+            const withdrawSnapshot = await db.collection('withdraw_requests').get();
+            withdrawSnapshot.forEach(doc => {
+                const withdraw = doc.data();
+                const withdrawId = doc.id;
+                const withdrawItem = document.createElement('div');
+                withdrawItem.className = 'withdraw-item';
+                withdrawItem.innerHTML = `
+                    <p>ID: ${withdrawId} | User: ${withdraw.username || 'Anonymous'} (${withdraw.telegramId})</p>
+                    <p>Amount: ${withdraw.amount} | Method: ${withdraw.method} | Details: ${withdraw.details}</p>
+                    <p>Status: ${withdraw.status} | Requested: ${withdraw.timestamp.toDate().toLocaleString()}</p>
+                    ${withdraw.status === 'Pending' ? `
+                        <select onchange="updateSelectedWithdraw('${withdrawId}', this.value)">
+                            <option value="">Select Action</option>
+                            <option value="pay">Pay</option>
+                            <option value="cancel">Cancel</option>
+                        </select>
+                    ` : ''}
+                `;
+                withdrawList.appendChild(withdrawItem);
             });
         }
 
@@ -1443,7 +1439,7 @@
             const userRef = db.collection('users').doc(selectedUserId);
             await userRef.update({
                 isBanned: false,
-                banMessage: '',
+                banMessage: 'No reason provided.',
                 unbanMessage: unbanMessage || 'Welcome back!',
                 shownUnbanMessage: false
             });
@@ -1689,9 +1685,9 @@
             try {
                 await testUserRef.set({
                     telegramId: testUserId,
-                    username: `TestUser_${testUserCounter}`,
-                    coins: 0,
-                    referralLink: `${baseReferralUrl}test${testUserCounter}`,
+                    username: `TestUser${testUserCounter}`,
+                    coins: 100,
+                    referralLink: `${baseReferralUrl}test${testUserId}`,
                     invitedUsers: [],
                     isBanned: false,
                     banMessage: '',
@@ -1705,10 +1701,10 @@
                     transactionHistory: [],
                     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                document.getElementById('admin-access-message').textContent = `Test user ${testUserId} created successfully!`;
+                document.getElementById('admin-access-message').textContent = `Test user ${testUserId} created with 100 coins.`;
             } catch (error) {
-                console.error('Error writing test user:', error);
-                document.getElementById('admin-access-message').textContent = 'Error writing test user: ' + error.message;
+                console.error('Firestore write test failed:', error);
+                document.getElementById('admin-access-message').textContent = 'Firestore write test failed: ' + error.message;
             }
         }
 
@@ -1728,7 +1724,7 @@
         function updateProfile(userData) {
             document.getElementById('profile-username').textContent = `Username: ${userData.username || 'Anonymous'}`;
             document.getElementById('profile-id').textContent = `Telegram ID: ${userData.telegramId}`;
-            document.getElementById('profile-joined').textContent = `Joined: ${userData.joinedAt ? userData.joinedAt.toDate().toLocaleDateString() : 'Unknown'}`;
+            document.getElementById('profile-joined').textContent = `Joined: ${userData.joinedAt?.toDate().toLocaleString() || 'Unknown'}`;
             document.getElementById('profile-referral').textContent = `Referral Link: ${userData.referralLink}`;
         }
 
@@ -1739,56 +1735,70 @@
             const userData = userDoc.data();
             updateProfile(userData);
 
-            const transactionList = document.getElementById('transaction-history');
-            transactionList.innerHTML = '';
+            const transactionHistory = document.getElementById('transaction-history');
+            transactionHistory.innerHTML = '';
             const transactions = userData.transactionHistory || [];
-            const referralEvents = userData.referralEvents || [];
-            const withdrawalHistory = userData.withdrawalHistory || [];
-
-            referralEvents.forEach(event => {
-                transactions.push({
-                    type: 'Credit',
-                    amount: event.coinsAwarded,
-                    reason: `Referral - ${event.referredUsername}`,
-                    timestamp: event.timestamp
-                });
-            });
-
-            withdrawalHistory.forEach(withdraw => {
-                transactions.push({
-                    type: 'Debit',
-                    amount: withdraw.amount,
-                    reason: `Withdrawal - ${withdraw.method} (${withdraw.status})`,
-                    timestamp: firebase.firestore.Timestamp.fromDate(new Date(withdraw.timestamp))
-                });
-            });
-
-            transactions.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
-
             if (transactions.length === 0) {
-                const noTransaction = document.createElement('p');
-                noTransaction.textContent = 'No transactions yet.';
-                transactionList.appendChild(noTransaction);
+                transactionHistory.innerHTML = '<p>No transactions yet.</p>';
             } else {
                 transactions.forEach(tx => {
-                    const txItem = document.createElement('div');
-                    txItem.className = 'transaction-item';
-                    txItem.style = 'background: rgba(255, 255, 255, 0.05); padding: 0.5rem; margin: 0.5rem 0; border-radius: 10px;';
-                    const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Unknown';
-                    txItem.innerHTML =                        `<p>${tx.type}: ${tx.amount} Coins - ${tx.reason}</p>
-                        <p>Date: ${date}</p>`;
-                    transactionList.appendChild(txItem);
+                    const txItem = document.createElement('p');
+                    txItem.textContent = `${tx.type}: ${tx.amount} coins - ${tx.reason} on ${tx.timestamp.toDate().toLocaleString()}`;
+                    transactionHistory.appendChild(txItem);
                 });
+            }
+        }
+
+        async function refreshData() {
+            if (!currentUser || !db) {
+                document.getElementById('admin-access-message').textContent = 'Database or user not initialized.';
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'flex';
+            try {
+                const userRef = db.collection('users').doc(currentUser.id.toString());
+                const userDoc = await userRef.get();
+                const userData = userDoc.data();
+                if (!userData) return;
+
+                // Update balance page
+                balance = userData.coins || 0;
+                document.getElementById('balance-amount').textContent = `${balance} Coins`;
+
+                // Update invite page
+                friendsInvited = userData.invitedUsers ? userData.invitedUsers.length : 0;
+                document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
+                document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
+
+                // Update profile page
+                updateProfile(userData);
+                await loadProfile();
+
+                // Check for new notices
+                await checkForNotices();
+
+                // Check withdrawal status
+                await checkWithdrawStatus();
+
+                // Update admin panel if admin is authenticated
+                if (isAdminAuthenticated) {
+                    await updateDashboardSummary();
+                    await loadAdminPanel();
+                }
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                document.getElementById('admin-access-message').textContent = 'Error refreshing data: ' + error.message;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
 
         window.addEventListener('load', async () => {
             await initializeFirebase();
-            const isTelegramInitialized = initTelegram();
-            if (isTelegramInitialized) {
-                showPage('balance');
-            } else {
-                document.getElementById('admin-access-message').textContent = 'Please open this app in Telegram.';
+            const telegramInitialized = initTelegram();
+            if (telegramInitialized) {
+                document.getElementById('loading').style.display = 'none';
             }
         });
 
