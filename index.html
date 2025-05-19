@@ -601,20 +601,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Language Toggle */
-        .language-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 100;
-        }
-
-        .language-toggle select {
-            width: auto;
-            padding: 0.5rem;
-            font-size: clamp(0.8rem, 1.2vw, 1rem);
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .app {
@@ -660,12 +646,6 @@
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
     </div>
-    <div class="language-toggle">
-        <select id="language-select" onchange="changeLanguage(this.value)">
-            <option value="en">English</option>
-            <option value="bn">বাংলা</option>
-        </select>
-    </div>
     <canvas id="particles"></canvas>
     <div class="splash" id="splash">
         <h1>LBBD COMMUNITY</h1>
@@ -673,29 +653,21 @@
     </div>
     <div class="app" id="app">
         <div class="page balance-page" id="balance">
-            <h2 data-lang="en">Your Balance</h2>
-            <h2 data-lang="bn" style="display: none;">আপনার ব্যালেন্স</h2>
+            <h2>Your Balance</h2>
             <p id="balance-amount">0 Coins</p>
-            <p data-lang="en">Current coin value: To be announced soon!</p>
-            <p data-lang="bn" style="display: none;">বর্তমান কয়েন মূল্য: শীঘ্রই ঘোষণা করা হবে!</p>
+            <p>Current coin value: To be announced soon!</p>
         </div>
         <div class="page invite-page" id="invite">
-            <h2 data-lang="en">Invite</h2>
-            <h2 data-lang="bn" style="display: none;">আমন্ত্রণ</h2>
-            <p data-lang="en">Share your unique referral link and earn 1 coin per friend who joins @earn_by_lbbd_bot!</p>
-            <p data-lang="bn" style="display: none;">আপনার অনন্য রেফারেল লিঙ্ক শেয়ার করুন এবং প্রতি বন্ধু যিনি @earn_by_lbbd_bot এ যোগ দেন তার জন্য ১ কয়েন উপার্জন করুন!</p>
+            <h2>Invite</h2>
+            <p>Share your unique referral link and earn 1 coin per friend who joins @earn_by_lbbd_bot!</p>
             <p id="referral-link">Generating your link...</p>
-            <p id="friends-invited" data-lang="en">Friends Invited: 0</p>
-            <p id="friends-invited-bn" data-lang="bn" style="display: none;">আমন্ত্রিত বন্ধুরা: ০</p>
+            <p id="friends-invited">Friends Invited: 0</p>
             <p id="invite-status"></p>
-            <button class="action-button" onclick="shareBot()" data-lang="en">Share @earn_by_lbbd_bot</button>
-            <button class="action-button" onclick="shareBot()" data-lang="bn" style="display: none;">@earn_by_lbbd_bot শেয়ার করুন</button>
+            <button class="action-button" onclick="shareBot()">Share @earn_by_lbbd_bot</button>
         </div>
         <div class="page withdraw-page" id="withdraw">
-            <h2 data-lang="en">Withdraw Coins</h2>
-            <h2 data-lang="bn" style="display: none;">কয়েন উত্তোলন</h2>
-            <p data-lang="en">Minimum withdrawal amount: To be announced soon!</p>
-            <p data-lang="bn" style="display: none;">ন্যূনতম উত্তোলন পরিমাণ: শীঘ্রই ঘোষণা করা হবে!</p>
+            <h2>Withdraw Coins</h2>
+            <p>Minimum withdrawal amount: To be announced soon!</p>
             <select id="method">
                 <option value="bKash">bKash</option>
                 <option value="Nagad">Nagad</option>
@@ -705,273 +677,200 @@
             <input type="number" id="amount" placeholder="Enter amount" min="1" onkeypress="restrictToNumbers(event)">
             <input type="text" id="details" placeholder="Enter payment details">
             <p id="withdraw-status"></p>
-            <button class="action-button" onclick="withdraw()" data-lang="en">Submit Withdrawal</button>
-            <button class="action-button" onclick="withdraw()" data-lang="bn" style="display: none;">উত্তোলন জমা দিন</button>
+            <button class="action-button" onclick="withdraw()">Submit Withdrawal</button>
         </div>
         <div class="page about-page" id="about">
-            <h2 data-lang="en">About LBBD Community</h2>
-            <h2 data-lang="bn" style="display: none;">LBBD কমিউনিটি সম্পর্কে</h2>
-            <p data-lang="en">
+            <h2>About LBBD Community</h2>
+            <p>
                 LBBD COMMUNITY is pioneering the Tap-2-Earn revolution in Bangladesh, inspired by projects like Hamster Kombat.
                 Our mission is to empower users through innovative, rewarding, and engaging platforms.
                 This referral web app is just the beginning — join us to support our journey and unlock exciting Tap-2-Earn bots and more!
             </p>
-            <p data-lang="bn" style="display: none;">
-                এলবিবিডি কমিউনিটি বাংলাদেশে ট্যাপ-২-আর্ন বিপ্লবের পথিকৃৎ, হ্যামস্টার কম্ব্যাটের মতো প্রকল্প দ্বারা অনুপ্রাণিত।
-                আমাদের লক্ষ্য হলো উদ্ভাবনী, পুরস্কৃত এবং আকর্ষণীয় প্ল্যাটফর্মের মাধ্যমে ব্যবহারকারীদের ক্ষমতায়ন করা।
-                এই রেফারেল ওয়েব অ্যাপটি কেবল শুরু — আমাদের যাত্রায় সমর্থন করতে এবং আরও উত্তেজনাপূর্ণ ট্যাপ-২-আর্ন বট আনলক করতে আমাদের সাথে যোগ দিন!
-            </p>
-            <p data-lang="en">Join our bot: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
-            <p data-lang="bn" style="display: none;">আমাদের বটে যোগ দিন: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
-            <p data-lang="en">By using this app, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>.</p>
-            <p data-lang="bn" style="display: none;">এই অ্যাপটি ব্যবহার করে, আপনি আমাদের <a href="#terms">সেবার শর্তাবলী</a> এবং <a href="#privacy">গোপনীয়তা নীতি</a> এর সাথে সম্মত হচ্ছেন।</p>
+            <p>Join our bot: <a href="https://t.me/earn_by_lbbd_bot" target="_blank">@earn_by_lbbd_bot</a></p>
+            <p>By using this app, you agree to our <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>.</p>
             <div class="notice">
-                <span data-lang="en">Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
-                <span data-lang="bn" style="display: none;">হ্যামস্টার কম্ব্যাটের মতো, এলবিবিডি কমিউনিটি @earn_by_lbbd_bot এর সাথে ট্যাপ-২-আর্ন চালু করছে। এখনই যোগ দিন!</span>
+                <span>Like Hamster Kombat, LBBD COMMUNITY is launching Tap-2-Earn with @earn_by_lbbd_bot. Join now!</span>
             </div>
         </div>
         <div class="page profile-page" id="profile">
-            <h2 data-lang="en">Your Profile</h2>
-            <h2 data-lang="bn" style="display: none;">আপনার প্রোফাইল</h2>
+            <h2>Your Profile</h2>
             <p id="profile-username">Username: Loading...</p>
             <p id="profile-id">Telegram ID: Loading...</p>
             <p id="profile-joined">Joined: Loading...</p>
             <p id="profile-referral">Referral Link: Loading...</p>
-            <h3 data-lang="en">Coin Transaction History</h3>
-            <h3 data-lang="bn" style="display: none;">কয়েন লেনদেনের ইতিহাস</h3>
+            <h3>Coin Transaction History</h3>
             <div id="transaction-history" class="transaction-history"></div>
         </div>
         <div class="page admin-page" id="admin">
-            <h2 data-lang="en">Admin Panel</h2>
-            <h2 data-lang="bn" style="display: none;">অ্যাডমিন প্যানেল</h2>
-            <button onclick="testFirestoreWrite()" data-lang="en">Test Firestore Write</button>
-            <button onclick="testFirestoreWrite()" data-lang="bn" style="display: none;">ফায়ারস্টোর লেখার পরীক্ষা</button>
+            <h2>Admin Panel</h2>
+            <button onclick="testFirestoreWrite()">Test Firestore Write</button>
             <p id="admin-access-message">Welcome, Admin!</p>
             <div class="summary-section">
-                <h3 data-lang="en">Dashboard Summary</h3>
-                <h3 data-lang="bn" style="display: none;">ড্যাশবোর্ড সারাংশ</h3>
-                <p data-lang="en">Total Users: <span id="total-users">0</span></p>
-                <p data-lang="bn" style="display: none;">মোট ব্যবহারকারী: <span id="total-users">০</span></p>
-                <p data-lang="en">Total Coins in Circulation: <span id="total-coins">0</span></p>
-                <p data-lang="bn" style="display: none;">মোট কয়েন প্রচলনে: <span id="total-coins">০</span></p>
-                <p data-lang="en">Pending Withdrawals: <span id="pending-withdrawals">0</span></p>
-                <p data-lang="bn" style="display: none;">মুলতুবি উত্তোলন: <span id="pending-withdrawals">০</span></p>
+                <h3>Dashboard Summary</h3>
+                <p>Total Users: <span id="total-users">0</span></p>
+                <p>Total Coins in Circulation: <span id="total-coins">0</span></p>
+                <p>Pending Withdrawals: <span id="pending-withdrawals">0</span></p>
             </div>
             <div class="admin-section">
-                <h3 data-lang="en">User Management</h3>
-                <h3 data-lang="bn" style="display: none;">ব্যবহারকারী ব্যবস্থাপনা</h3>
+                <h3>User Management</h3>
                 <div class="user-list" id="user-list"></div>
             </div>
             <div class="admin-section">
-                <h3 data-lang="en">Withdrawal Requests</h3>
-                <h3 data-lang="bn" style="display: none;">উত্তোলনের অনুরোধ</h3>
+                <h3>Withdrawal Requests</h3>
                 <div class="withdraw-list" id="withdraw-list"></div>
             </div>
             <div class="admin-section">
-                <h3 data-lang="en">Send Notice to All Users</h3>
-                <h3 data-lang="bn" style="display: none;">সকল ব্যবহারকারীকে নোটিশ পাঠান</h3>
+                <h3>Send Notice to All Users</h3>
                 <div class="notice-form">
                     <input type="text" id="admin-notice" placeholder="Enter notice message">
-                    <button onclick="sendNotice()" data-lang="en">Send Notice</button>
-                    <button onclick="sendNotice()" data-lang="bn" style="display: none;">নোটিশ পাঠান</button>
+                    <button onclick="sendNotice()">Send Notice</button>
                 </div>
                 <p id="notice-status"></p>
             </div>
         </div>
     </div>
     <div class="nav" id="nav">
-        <button id="nav-balance" data-lang="en">Balance</button>
-        <button id="nav-balance" data-lang="bn" style="display: none;">ব্যালেন্স</button>
-        <button id="nav-invite" data-lang="en">Invite</button>
-        <button id="nav-invite" data-lang="bn" style="display: none;">আমন্ত্রণ</button>
-        <button id="nav-withdraw" data-lang="en">Withdraw</button>
-        <button id="nav-withdraw" data-lang="bn" style="display: none;">উত্তোলন</button>
-        <button id="nav-about" data-lang="en">About</button>
-        <button id="nav-about" data-lang="bn" style="display: none;">সম্পর্কে</button>
-        <button id="nav-profile" data-lang="en">Profile</button>
-        <button id="nav-profile" data-lang="bn" style="display: none;">প্রোফাইল</button>
-        <button id="nav-admin" data-lang="en">Admin</button>
-        <button id="nav-admin" data-lang="bn" style="display: none;">অ্যাডমিন</button>
+        <button id="nav-balance">Balance</button>
+        <button id="nav-invite">Invite</button>
+        <button id="nav-withdraw">Withdraw</button>
+        <button id="nav-about">About</button>
+        <button id="nav-profile">Profile</button>
+        <button id="nav-admin">Admin</button>
     </div>
     <div class="popup-overlay" id="admin-popup">
         <div class="popup">
-            <h3 data-lang="en">Admin Access</h3>
-            <h3 data-lang="bn" style="display: none;">অ্যাডমিন অ্যাক্সেস</h3>
+            <h3>Admin Access</h3>
             <input type="password" id="admin-password" placeholder="Enter admin password">
             <div class="button-group">
-                <button onclick="checkAdminPassword()" data-lang="en">Submit</button>
-                <button onclick="checkAdminPassword()" data-lang="bn" style="display: none;">জমা দিন</button>
-                <button onclick="closePopup()" data-lang="en">Cancel</button>
-                <button onclick="closePopup()" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="checkAdminPassword()">Submit</button>
+                <button onclick="closePopup()">Cancel</button>
             </div>
-            <p class="error-message" id="admin-error" data-lang="en">Incorrect password. Please try again.</p>
-            <p class="error-message" id="admin-error-bn" data-lang="bn" style="display: none;">ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।</p>
+            <p class="error-message" id="admin-error">Incorrect password. Please try again.</p>
         </div>
     </div>
     <div class="popup-overlay" id="notice-popup">
         <div class="popup">
-            <h3 data-lang="en">Admin Notice</h3>
-            <h3 data-lang="bn" style="display: none;">অ্যাডমিন নোটিশ</h3>
+            <h3>Admin Notice</h3>
             <p id="notice-message"></p>
             <div class="button-group">
-                <button onclick="closeNoticePopup()" data-lang="en">Close</button>
-                <button onclick="closeNoticePopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+                <button onclick="closeNoticePopup()">Close</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-confirm-popup">
         <div class="popup">
-            <h3 data-lang="en">Confirm Ban</h3>
-            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা নিশ্চিত করুন</h3>
-            <p data-lang="en">Are you sure you want to ban this user?</p>
-            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে নিষিদ্ধ করতে চান?</p>
+            <h3>Confirm Ban</h3>
+            <p>Are you sure you want to ban this user?</p>
             <div class="button-group">
-                <button onclick="confirmBan(true)" data-lang="en">OK</button>
-                <button onclick="confirmBan(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-                <button onclick="confirmBan(false)" data-lang="en">Cancel</button>
-                <button onclick="confirmBan(false)" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="confirmBan(true)">OK</button>
+                <button onclick="confirmBan(false)">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-message-popup">
         <div class="popup">
-            <h3 data-lang="en">Ban Reason</h3>
-            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞার কারণ</h3>
-            <p data-lang="en">Type a message explaining why this user is being banned:</p>
-            <p data-lang="bn" style="display: none;">এই ব্যবহারকারীকে কেন নিষিদ্ধ করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
+            <h3>Ban Reason</h3>
+            <p>Type a message explaining why this user is being banned:</p>
             <textarea id="ban-message-input" placeholder="Enter ban reason"></textarea>
             <div class="button-group">
-                <button onclick="submitBanMessage()" data-lang="en">Submit</button>
-                <button onclick="submitBanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="submitBanMessage()">Submit</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-confirm-popup">
         <div class="popup">
-            <h3 data-lang="en">Confirm Unban</h3>
-            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা তুলে নেওয়া নিশ্চিত করুন</h3>
-            <p data-lang="en">Are you sure you want to unban this user?</p>
-            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীর নিষেধাজ্ঞা তুলে নিতে চান?</p>
+            <h3>Confirm Unban</h3>
+            <p>Are you sure you want to unban this user?</p>
             <div class="button-group">
-                <button onclick="confirmUnban(true)" data-lang="en">OK</button>
-                <button onclick="confirmUnban(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-                <button onclick="confirmUnban(false)" data-lang="en">Cancel</button>
-                <button onclick="confirmUnban(false)" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="confirmUnban(true)">OK</button>
+                <button onclick="confirmUnban(false)">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-message-popup">
         <div class="popup">
-            <h3 data-lang="en">Unban Message</h3>
-            <h3 data-lang="bn" style="display: none;">নিষেধাজ্ঞা তুলে নেওয়ার বার্তা</h3>
-            <p data-lang="en">Type a special message for this user:</p>
-            <p data-lang="bn" style="display: none;">এই ব্যবহারকারীর জন্য একটি বিশেষ বার্তা টাইপ করুন:</p>
+            <h3>Unban Message</h3>
+            <p>Type a special message for this user:</p>
             <textarea id="unban-message-input" placeholder="Enter unban message"></textarea>
             <div class="button-group">
-                <button onclick="submitUnbanMessage()" data-lang="en">Submit</button>
-                <button onclick="submitUnbanMessage()" data-lang="bn" style="display: none;">জমা দিন</button>
+                <button onclick="submitUnbanMessage()">Submit</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="ban-notification-popup">
         <div class="popup">
-            <h3 data-lang="en">You Are Banned</h3>
-            <h3 data-lang="bn" style="display: none;">আপনি নিষিদ্ধ হয়েছেন</h3>
+            <h3>You Are Banned</h3>
             <p id="ban-notification-message"></p>
             <div class="button-group">
-                <button onclick="closeBot()" data-lang="en">Cancel</button>
-                <button onclick="closeBot()" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="closeBot()">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="unban-notification-popup">
         <div class="popup">
-            <h3 data-lang="en">Congratulations!</h3>
-            <h3 data-lang="bn" style="display: none;">অভিনন্দন!</h3>
-            <p data-lang="en">You have been unbanned!</p>
-            <p data-lang="bn" style="display: none;">আপনার নিষেধাজ্ঞা তুলে নেওয়া হয়েছে!</p>
+            <h3>Congratulations!</h3>
+            <p>You have been unbanned!</p>
             <p id="unban-notification-message"></p>
             <div class="button-group">
-                <button onclick="closeUnbanNotification()" data-lang="en">OK</button>
-                <button onclick="closeUnbanNotification()" data-lang="bn" style="display: none;">ঠিক আছে</button>
+                <button onclick="closeUnbanNotification()">OK</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="add-coins-popup">
         <div class="popup">
-            <h3 data-lang="en">Add Coins</h3>
-            <h3 data-lang="bn" style="display: none;">কয়েন যোগ করুন</h3>
-            <p data-lang="en">Enter the amount of coins to add:</p>
-            <p data-lang="bn" style="display: none;">যোগ করার জন্য কয়েনের পরিমাণ লিখুন:</p>
+            <h3>Add Coins</h3>
+            <p>Enter the amount of coins to add:</p>
             <input type="number" id="add-coins-input" placeholder="Enter amount" min="1">
             <div class="button-group">
-                <button onclick="submitAddCoins()" data-lang="en">Submit</button>
-                <button onclick="submitAddCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
-                <button onclick="cancelAction()" data-lang="en">Cancel</button>
-                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="submitAddCoins()">Submit</button>
+                <button onclick="cancelAction()">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="subtract-coins-popup">
         <div class="popup">
-            <h3 data-lang="en">Subtract Coins</h3>
-            <h3 data-lang="bn" style="display: none;">কয়েন বিয়োগ করুন</h3>
-            <p data-lang="en">Enter the amount of coins to subtract:</p>
-            <p data-lang="bn" style="display: none;">বিয়োগ করার জন্য কয়েনের পরিমাণ লিখুন:</p>
+            <h3>Subtract Coins</h3>
+            <p>Enter the amount of coins to subtract:</p>
             <input type="number" id="subtract-coins-input" placeholder="Enter amount" min="1">
-            <p id="subtract-error" class="error-message" data-lang="en" style="display: none;">Cannot subtract: User has 0 coins.</p>
-            <p id="subtract-error-bn" class="error-message" data-lang="bn" style="display: none;">বিয়োগ করা যাবে না: ব্যবহারকারীর ০ কয়েন আছে।</p>
+            <p id="subtract-error" class="error-message" style="display: none;">Cannot subtract: User has 0 coins.</p>
             <div class="button-group">
-                <button onclick="submitSubtractCoins()" data-lang="en">Submit</button>
-                <button onclick="submitSubtractCoins()" data-lang="bn" style="display: none;">জমা দিন</button>
-                <button onclick="cancelAction()" data-lang="en">Cancel</button>
-                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="submitSubtractCoins()">Submit</button>
+                <button onclick="cancelAction()">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="withdraw-status-popup">
         <div class="popup">
-            <h3 data-lang="en">Withdrawal Status</h3>
-            <h3 data-lang="bn" style="display: none;">উত্তোলনের অবস্থা</h3>
+            <h3>Withdrawal Status</h3>
             <p id="withdraw-status-message"></p>
             <div class="button-group">
-                <button onclick="closeWithdrawStatusPopup()" data-lang="en">Close</button>
-                <button onclick="closeWithdrawStatusPopup()" data-lang="bn" style="display: none;">বন্ধ করুন</button>
+                <button onclick="closeWithdrawStatusPopup()">Close</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="cancel-reason-popup">
         <div class="popup">
-            <h3 data-lang="en">Cancellation Reason</h3>
-            <h3 data-lang="bn" style="display: none;">বাতিলের কারণ</h3>
-            <p data-lang="en">Type a message explaining why this withdrawal is being cancelled:</p>
-            <p data-lang="bn" style="display: none;">এই উত্তোলন কেন বাতিল করা হচ্ছে তা ব্যাখ্যা করে একটি বার্তা টাইপ করুন:</p>
+            <h3>Cancellation Reason</h3>
+            <p>Type a message explaining why this withdrawal is being cancelled:</p>
             <textarea id="cancel-reason-input" placeholder="Enter cancellation reason"></textarea>
             <div class="button-group">
-                <button onclick="submitCancelReason()" data-lang="en">Submit</button>
-                <button onclick="submitCancelReason()" data-lang="bn" style="display: none;">জমা দিন</button>
-                <button onclick="cancelAction()" data-lang="en">Cancel</button>
-                <button onclick="cancelAction()" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="submitCancelReason()">Submit</button>
+                <button onclick="cancelAction()">Cancel</button>
             </div>
         </div>
     </div>
     <div class="popup-overlay" id="delete-confirm-popup">
         <div class="popup">
-            <h3 data-lang="en">Confirm Delete</h3>
-            <h3 data-lang="bn" style="display: none;">মুছে ফেলা নিশ্চিত করুন</h3>
-            <p data-lang="en">Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
-            <p data-lang="bn" style="display: none;">আপনি কি নিশ্চিত এই ব্যবহারকারীকে মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না এবং সমস্ত ব্যবহারকারীর ডেটা হারিয়ে যাবে।</p>
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this user? This action cannot be undone, and all user data will be lost.</p>
             <div class="button-group">
-                <button onclick="confirmDelete(true)" data-lang="en">OK</button>
-                <button onclick="confirmDelete(true)" data-lang="bn" style="display: none;">ঠিক আছে</button>
-                <button onclick="confirmDelete(false)" data-lang="en">Cancel</button>
-                <button onclick="confirmDelete(false)" data-lang="bn" style="display: none;">বাতিল</button>
+                <button onclick="confirmDelete(true)">OK</button>
+                <button onclick="confirmDelete(false)">Cancel</button>
             </div>
         </div>
     </div>
     <script>
         let db = null;
-        let currentLanguage = 'en';
 
         async function initializeFirebase() {
             try {
@@ -1156,7 +1055,6 @@
                 document.getElementById('balance-amount').textContent = `${balance} Coins`;
                 document.getElementById('referral-link').textContent = `Your referral link: ${userData.referralLink}`;
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-                document.getElementById('friends-invited-bn').textContent = `আমন্ত্রিত বন্ধুরা: ${friendsInvited}`;
                 await userRef.update({ hasJoinedBot: true });
                 console.log('User data loaded:', userData);
                 updateProfile(userData);
@@ -1239,7 +1137,6 @@
                 friendsInvited = updatedInvited.length;
                 document.getElementById('balance-amount').textContent = `${balance} Coins`;
                 document.getElementById('friends-invited').textContent = `Friends Invited: ${friendsInvited}`;
-                document.getElementById('friends-invited-bn').textContent = `আমন্ত্রিত বন্ধুরা: ${friendsInvited}`;
             }
 
             document.getElementById('invite-status').textContent = `You joined via ${referrerData.username || 'a friend'}'s referral! They earned 1 coin.`;
@@ -1265,7 +1162,6 @@
             document.getElementById('admin-popup').style.display = 'flex';
             document.getElementById('admin-password').value = '';
             document.getElementById('admin-error').style.display = 'none';
-            document.getElementById('admin-error-bn').style.display = 'none';
             document.getElementById('admin-password').focus();
         }
 
@@ -1447,10 +1343,8 @@
                     const userItem = document.createElement('div');
                     userItem.className = 'user-item';
                     userItem.innerHTML = `
-                        <p data-lang="en">ID: ${userId} | Username: ${user.username || 'Anonymous'}</p>
-                        <p data-lang="bn" style="display: none;">আইডি: ${userId} | ব্যবহারকারীর নাম: ${user.username || 'অজানা'}</p>
-                        <p data-lang="en">Coins: <span id="coin-${userId}">${user.coins || 0}</span> | Banned: ${user.isBanned ? 'Yes' : 'No'}</p>
-                        <p data-lang="bn" style="display: none;">কয়েন: <span id="coin-${userId}">${user.coins || 0}</span> | নিষিদ্ধ: ${user.isBanned ? 'হ্যাঁ' : 'না'}</p>
+                        <p>ID: ${userId} | Username: ${user.username || 'Anonymous'}</p>
+                        <p>Coins: <span id="coin-${userId}">${user.coins || 0}</span> | Banned: ${user.isBanned ? 'Yes' : 'No'}</p>
                         <select id="user-select-${userId}" onchange="updateSelectedUser('${userId}', this.value)">
                             <option value="">Select Action</option>
                             <option value="ban">${user.isBanned ? 'Update Ban Reason' : 'Ban'}</option>
@@ -1474,12 +1368,9 @@
                     const withdrawItem = document.createElement('div');
                     withdrawItem.className = 'withdraw-item';
                     withdrawItem.innerHTML = `
-                        <p data-lang="en">ID: ${withdrawId} | User: ${withdraw.username || 'Anonymous'} (${withdraw.telegramId})</p>
-                        <p data-lang="bn" style="display: none;">আইডি: ${withdrawId} | ব্যবহারকারী: ${withdraw.username || 'অজানা'} (${withdraw.telegramId})</p>
-                        <p data-lang="en">Amount: ${withdraw.amount} | Method: ${withdraw.method} | Details: ${withdraw.details}</p>
-                        <p data-lang="bn" style="display: none;">পরিমাণ: ${withdraw.amount} | পদ্ধতি: ${withdraw.method} | বিস্তারিত: ${withdraw.details}</p>
-                        <p data-lang="en">Status: ${withdraw.status} | Requested: ${withdraw.timestamp.toDate().toLocaleString()}</p>
-                        <p data-lang="bn" style="display: none;">অবস্থা: ${withdraw.status} | অনুরোধ করা হয়েছে: ${withdraw.timestamp.toDate().toLocaleString()}</p>
+                        <p>ID: ${withdrawId} | User: ${withdraw.username || 'Anonymous'} (${withdraw.telegramId})</p>
+                        <p>Amount: ${withdraw.amount} | Method: ${withdraw.method} | Details: ${withdraw.details}</p>
+                        <p>Status: ${withdraw.status} | Requested: ${withdraw.timestamp.toDate().toLocaleString()}</p>
                         ${withdraw.status === 'Pending' ? `
                             <select onchange="updateSelectedWithdraw('${withdrawId}', this.value)">
                                 <option value="">Select Action</option>
@@ -1506,7 +1397,6 @@
             } else if (action === 'subtractCoins') {
                 document.getElementById('subtract-coins-input').value = '';
                 document.getElementById('subtract-error').style.display = 'none';
-                document.getElementById('subtract-error-bn').style.display = 'none';
                 document.getElementById('subtract-coins-popup').style.display = 'flex';
             } else if (action === 'delete') {
                 document.getElementById('delete-confirm-popup').style.display = 'flex';
@@ -1604,8 +1494,7 @@
             const currentCoins = userData.coins || 0;
 
             if (currentCoins === 0 || amount > currentCoins) {
-                document.getElementById('subtract-error').style.display = currentLanguage === 'en' ? 'block' : 'none';
-                document.getElementById('subtract-error-bn').style.display = currentLanguage === 'bn' ? 'block' : 'none';
+                document.getElementById('subtract-error').style.display = 'block';
                 return;
             }
 
@@ -1832,20 +1721,8 @@
                 loadAdminPanel();
                 document.getElementById('nav').classList.add('admin-active');
             } else {
-                document.getElementById('admin-error').style.display = currentLanguage === 'en' ? 'block' : 'none';
-                document.getElementById('admin-error-bn').style.display = currentLanguage === 'bn' ? 'block' : 'none';
+                document.getElementById('admin-error').style.display = 'block';
             }
-        }
-
-        function changeLanguage(lang) {
-            currentLanguage = lang;
-            document.querySelectorAll('[data-lang]').forEach(elem => {
-                if (elem.getAttribute('data-lang') === lang) {
-                    elem.style.display = 'block';
-                } else {
-                    elem.style.display = 'none';
-                }
-            });
         }
 
         function updateProfile(userData) {
@@ -1890,7 +1767,7 @@
 
             if (transactions.length === 0) {
                 const noTransaction = document.createElement('p');
-                noTransaction.textContent = currentLanguage === 'en' ? 'No transactions yet.' : 'এখনো কোনো লেনদেন নেই।';
+                noTransaction.textContent = 'No transactions yet.';
                 transactionList.appendChild(noTransaction);
             } else {
                 transactions.forEach(tx => {
@@ -1898,20 +1775,19 @@
                     txItem.className = 'transaction-item';
                     txItem.style = 'background: rgba(255, 255, 255, 0.05); padding: 0.5rem; margin: 0.5rem 0; border-radius: 10px;';
                     const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Unknown';
-                    txItem.innerHTML = `
-                        <p data-lang="en">${tx.type}: ${tx.amount} coins | ${tx.reason} | ${date}</p>
-                        <p data-lang="bn" style="display: none;">${tx.type === 'Credit' ? 'ক্রেডিট' : 'ডেবিট'}: ${tx.amount} কয়েন | ${tx.reason} | ${date}</p>
-                    `;
+                    txItem.innerHTML =                        `<p>${tx.type}: ${tx.amount} Coins - ${tx.reason}</p>
+                        <p>Date: ${date}</p>`;
                     transactionList.appendChild(txItem);
                 });
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            showPage('balance');
-            changeLanguage('en');
-            initializeFirebase();
-            if (!initTelegram()) {
+        window.addEventListener('load', async () => {
+            await initializeFirebase();
+            const isTelegramInitialized = initTelegram();
+            if (isTelegramInitialized) {
+                showPage('balance');
+            } else {
                 document.getElementById('admin-access-message').textContent = 'Please open this app in Telegram.';
             }
         });
